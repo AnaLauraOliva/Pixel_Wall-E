@@ -1,0 +1,200 @@
+[gd_scene load_steps=12 format=3 uid="uid://dqj1yqfnnatcs"]
+
+[ext_resource type="Script" uid="uid://oytfbrchqet8" path="res://Resources/Scripts/MainMenuVisual.cs" id="1_3q2da"]
+[ext_resource type="Texture2D" uid="uid://u7rltpd4sibi" path="res://Resources/Images/wall_e.png" id="1_lr1yo"]
+[ext_resource type="FontFile" uid="uid://21d6wdeaw6nh" path="res://Resources/Fonts/Bubblegum_Sans/BubblegumSans-Regular.ttf" id="2_jfdl7"]
+[ext_resource type="Texture2D" uid="uid://btfhnpflvnkj7" path="res://Resources/Styles/ButtonTextureHover.tres" id="3_rrhf6"]
+[ext_resource type="Texture2D" uid="uid://b5f50vv3alk28" path="res://Resources/Styles/ButtonsTexture.tres" id="3_ruh2y"]
+[ext_resource type="Texture2D" uid="uid://d0785g8r3mwaj" path="res://Resources/Styles/ButtonTexturePressed.tres" id="4_um54t"]
+
+[sub_resource type="Gradient" id="Gradient_i2ggv"]
+offsets = PackedFloat32Array(0.00869565, 0.573913)
+colors = PackedColorArray(0.721569, 0.207843, 1, 1, 1, 0.83178, 0.955498, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_87ndf"]
+gradient = SubResource("Gradient_i2ggv")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dq3xj"]
+texture = ExtResource("3_rrhf6")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_4othk"]
+texture = ExtResource("4_um54t")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_kd5yy"]
+resource_local_to_scene = true
+texture = ExtResource("3_ruh2y")
+region_rect = Rect2(0, -0.5, 64.5, 64.5)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3q2da")
+
+[node name="ColorBackground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_87ndf")
+
+[node name="BackgroundImage" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.164706)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_lr1yo")
+expand_mode = 1
+
+[node name="vbcMenu" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="Title" type="Label" parent="vbcMenu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 11
+theme_override_constants/shadow_outline_size = 20
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 50
+text = "Pixel Wall-E"
+
+[node name="StartBtn" type="Button" parent="vbcMenu"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_dq3xj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4othk")
+theme_override_styles/normal = SubResource("StyleBoxTexture_kd5yy")
+text = "Comenzar"
+
+[node name="DocumentationBtn" type="Button" parent="vbcMenu"]
+layout_mode = 2
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_dq3xj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4othk")
+theme_override_styles/normal = SubResource("StyleBoxTexture_kd5yy")
+text = "Documentación"
+
+[node name="AboutBtn" type="Button" parent="vbcMenu"]
+layout_mode = 2
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_dq3xj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4othk")
+theme_override_styles/normal = SubResource("StyleBoxTexture_kd5yy")
+text = "Acerca de"
+
+[node name="ExitBtn" type="Button" parent="vbcMenu"]
+layout_mode = 2
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_dq3xj")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_4othk")
+theme_override_styles/normal = SubResource("StyleBoxTexture_kd5yy")
+text = "Salir"
+
+[node name="AboutPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -519.0
+offset_top = -287.0
+offset_right = 514.0
+offset_bottom = 279.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="AboutPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = -123.5
+offset_right = 198.0
+offset_bottom = 123.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 32
+text = "Sobre el Proyecto:
+
+Nombre: Pixel Wall-E
+Wall-E se aburrió  de las figuras geométricas,
+en cambio, ahora quiere dedicarse al pixel-art .
+Mediante esta aplicación se pueden leer e interpretar comandos 
+mediante los cuales Wall-E pinta sobre un canvas cuadriculado
+Autora: Ana Laura Oliva Avilés
+Grupo: C111
+Hecho con: Godot 4.3.stable.mono
+Fuentes utilizadas: Bubblegum Sans"
+horizontal_alignment = 1
+
+[node name="BackBtn" type="Button" parent="AboutPanel"]
+layout_mode = 1
+offset_left = 9.0
+offset_top = 11.0
+offset_right = 66.0
+offset_bottom = 49.0
+theme_override_fonts/font = ExtResource("2_jfdl7")
+theme_override_font_sizes/font_size = 25
+text = "Atrás"
+
+[connection signal="button_down" from="vbcMenu/StartBtn" to="." method="_on_start_btn_button_down"]
+[connection signal="button_down" from="vbcMenu/AboutBtn" to="." method="_on_about_btn_button_down"]
+[connection signal="button_down" from="vbcMenu/ExitBtn" to="." method="_on_exit_btn_button_down"]
+[connection signal="button_down" from="AboutPanel/BackBtn" to="." method="_on_back_btn_button_down"]

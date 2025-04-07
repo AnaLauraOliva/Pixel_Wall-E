@@ -1,0 +1,356 @@
+[gd_scene load_steps=12 format=3 uid="uid://o0v7ls3wn1bf"]
+
+[ext_resource type="Script" uid="uid://db4f675xffwfu" path="res://Resources/Scripts/CompilerVisual.cs" id="1_8qigt"]
+[ext_resource type="FontFile" uid="uid://21d6wdeaw6nh" path="res://Resources/Fonts/Bubblegum_Sans/BubblegumSans-Regular.ttf" id="2_nveu8"]
+[ext_resource type="Script" uid="uid://chahfbgbmaf84" path="res://Resources/Scripts/CanvasPanelscript.cs" id="2_y2a8r"]
+[ext_resource type="Texture2D" uid="uid://btfhnpflvnkj7" path="res://Resources/Styles/ButtonTextureHover.tres" id="3_y2a8r"]
+[ext_resource type="Texture2D" uid="uid://d0785g8r3mwaj" path="res://Resources/Styles/ButtonTexturePressed.tres" id="4_a3gah"]
+[ext_resource type="Texture2D" uid="uid://b5f50vv3alk28" path="res://Resources/Styles/ButtonsTexture.tres" id="5_d4bf1"]
+
+[sub_resource type="Gradient" id="Gradient_j3e04"]
+offsets = PackedFloat32Array(0, 0.657895)
+colors = PackedColorArray(0.721964, 0.208487, 1, 1, 0.952941, 0.658824, 0.94902, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_8qigt"]
+gradient = SubResource("Gradient_j3e04")
+fill_from = Vector2(0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_unv02"]
+texture = ExtResource("3_y2a8r")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_c4ljo"]
+texture = ExtResource("4_a3gah")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_k25d3"]
+resource_local_to_scene = true
+texture = ExtResource("5_d4bf1")
+region_rect = Rect2(0, -0.5, 64.5, 64.5)
+
+[node name="CompilerScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_8qigt")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_8qigt")
+
+[node name="CanvasPanel" type="Panel" parent="."]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.444
+anchor_bottom = 1.0
+offset_right = 21.512
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("2_y2a8r")
+
+[node name="WidthLbl" type="Label" parent="CanvasPanel"]
+layout_mode = 1
+offset_left = 3.0
+offset_top = 19.0
+offset_right = 68.0
+offset_bottom = 49.0
+theme_override_constants/line_spacing = 0
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 25
+text = "Ancho:"
+
+[node name="Width" type="LineEdit" parent="CanvasPanel"]
+layout_mode = 1
+offset_left = 72.0
+offset_top = 10.0
+offset_right = 180.0
+offset_bottom = 56.0
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+text = "32"
+placeholder_text = "Ancho"
+alignment = 1
+
+[node name="HeightLbl" type="Label" parent="CanvasPanel"]
+layout_mode = 0
+offset_left = 191.0
+offset_top = 18.0
+offset_right = 256.0
+offset_bottom = 48.0
+theme_override_constants/line_spacing = 0
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 25
+text = "Largo:"
+
+[node name="Height" type="LineEdit" parent="CanvasPanel"]
+layout_mode = 1
+offset_left = 259.0
+offset_top = 9.0
+offset_right = 367.0
+offset_bottom = 55.0
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+text = "32"
+placeholder_text = "Largo"
+alignment = 1
+
+[node name="ApplyBtn" type="Button" parent="CanvasPanel"]
+layout_mode = 0
+offset_left = 384.0
+offset_top = 14.0
+offset_right = 507.0
+offset_bottom = 52.0
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Aplicar"
+
+[node name="Canvas" type="TextureRect" parent="CanvasPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -244.5
+offset_top = -252.0
+offset_right = 267.5
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="xAxisContainer" type="Control" parent="CanvasPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -244.5
+offset_top = 260.0
+offset_right = 267.5
+offset_bottom = 275.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="yAxisContainer" type="Control" parent="CanvasPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.5
+offset_top = -252.0
+offset_right = -250.5
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.47
+anchor_top = 0.082
+anchor_right = 1.0
+anchor_bottom = 0.694
+offset_left = -0.440063
+offset_top = -0.136002
+offset_right = -1.0
+offset_bottom = 0.287994
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CodeEdit" type="CodeEdit" parent="TextContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/line_number_color = Color(0.932625, 0.932625, 0.932625, 1)
+placeholder_text = "Introduce tu código de Wall-E aquí"
+highlight_all_occurrences = true
+highlight_current_line = true
+gutters_draw_line_numbers = true
+gutters_draw_fold_gutter = true
+code_completion_enabled = true
+indent_use_spaces = true
+indent_automatic = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.47
+anchor_right = 1.0
+anchor_bottom = 0.071
+offset_left = 0.559937
+offset_right = -2.0
+offset_bottom = -0.00800323
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="Save" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Guardar"
+
+[node name="Import" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Importar"
+
+[node name="Execute" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Ejecutar"
+
+[node name="Back" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Volver"
+
+[node name="Exit" type="Button" parent="ButtonsContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Salir
+"
+
+[node name="ProblemsContainer" type="BoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.47
+anchor_top = 0.698
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.559937
+offset_top = -0.304016
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="ProblemsDisplayer" type="TextEdit" parent="ProblemsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+editable = false
+
+[node name="ExportOrImport" type="PopupPanel" parent="."]
+size = Vector2i(250, 150)
+
+[node name="Text" type="Label" parent="ExportOrImport"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 246.0
+offset_bottom = 146.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OK" type="Button" parent="ExportOrImport"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 246.0
+offset_bottom = 146.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 8
+text = "OK"
+
+[node name="SaveImport" type="FileDialog" parent="."]
+auto_translate_mode = 1
+access = 2
+
+[connection signal="button_down" from="ButtonsContainer/Back" to="." method="_on_back_button_down"]
+[connection signal="button_down" from="ButtonsContainer/Exit" to="." method="_on_exit_button_down"]
