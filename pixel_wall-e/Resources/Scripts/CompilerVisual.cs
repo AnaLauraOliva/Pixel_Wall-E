@@ -8,7 +8,8 @@ public partial class CompilerVisual : Node
 {
     private CodeEdit _codeEdit;
     private TextEdit _problems;
-    private Lexer lexer;
+    //mediador entre el compilador y lo visual
+    private Handler handler;
     private Popup popup;
     private Button export;
     private Button import;
@@ -39,14 +40,9 @@ public partial class CompilerVisual : Node
         _problems.Text = "";
         if (_codeEdit.Text != "")
         {
-            lexer = new Lexer(_codeEdit.Text);
-            List<Token> tokens = lexer.ScanTokens();
-            List<CompilerException> exceptions = lexer.GetCompilerExceptions();
+            handler=new Handler(_codeEdit.Text);
+            List<CompilerException> exceptions = handler.GetExceptions();
             if(exceptions.Count!=0) PrintExceptions(exceptions);
-            foreach (Token token in tokens)
-            {
-                _problems.Text+=token;
-            }
         }
     }
     

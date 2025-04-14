@@ -1,6 +1,6 @@
 using System;
 
-class CompilerException:Exception
+public class CompilerException:Exception
 {
     public int Line { get;}
     public int Column { get;}

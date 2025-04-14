@@ -114,7 +114,7 @@ class Lexer
             {
                 _current++;
                 if (type == TokenType.SIMPLE_COMMENT || type == TokenType.LEFT_MULTILINE_COMMENT) Comment(type);
-                else AddToken(type, Color.Red);
+                else AddToken(type);
                 return;
             }
         }
@@ -124,7 +124,7 @@ class Lexer
             {
                 return;
             }
-            AddToken(_type, Color.Red);
+            AddToken(_type);
             return;
         }
         if (x == '"')
@@ -153,7 +153,7 @@ class Lexer
         while (!IsAtEnd() && char.IsLetter(_source[_current])) _current++;
         Exceptions.Add(new CompilerException("Lexical", "Invalid Identifier. Identifiers cannot start with " +
          (char.IsDigit(_source[_start]) ? "numbers" : "hypers"), _line, _column, _source.Substring(_start, _current - _start)));
-        AddToken(TokenType.IDENTIFIER);
+        AddToken(TokenType.UNKNOWN);
         return false;
     }
     //Adding only line and multi line to the lenguage
