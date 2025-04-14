@@ -2,12 +2,13 @@ using Godot;
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class CompilerVisual : Node
 {
     private CodeEdit _codeEdit;
     private TextEdit _problems;
-    private Scanner scanner;
+    private Lexer lexer;
     private Popup popup;
     private Button export;
     private Button import;
@@ -16,14 +17,18 @@ public partial class CompilerVisual : Node
     public override void _Ready()
     {
         _codeEdit = GetNode<HBoxContainer>("TextContainer").GetNode<CodeEdit>("CodeEdit");
-        _problems = GetNode<Container>("ProblemsContainer").GetNode<TextEdit>("ProblemsDisplayer");
-        popup = GetNode<Popup>("ExportOrImport");
         _codeEdit.TextChanged += Compile;
+
+        _problems = GetNode<Container>("ProblemsContainer").GetNode<TextEdit>("ProblemsDisplayer");
+
+        popup = GetNode<Popup>("ExportOrImport");
+        popup.GetNode<Button>("OK").Pressed += OkPressed;
+
         dialog = GetNode<FileDialog>("SaveImport");
         dialog.Access=FileDialog.AccessEnum.Filesystem;
         dialog.FileSelected+=ImportOrExport;
         dialog.AddFilter("*.pw", "Pixel Wall-E File");
-        popup.GetNode<Button>("OK").Pressed += OkPressed;
+        
         export = GetNode<HBoxContainer>("ButtonsContainer").GetNode<Button>("Save");
         import = GetNode<HBoxContainer>("ButtonsContainer").GetNode<Button>("Import");
         export.Pressed += ExportButtonPressed;
@@ -34,16 +39,22 @@ public partial class CompilerVisual : Node
         _problems.Text = "";
         if (_codeEdit.Text != "")
         {
-            scanner = new Scanner(_codeEdit.Text);
-            WallE.CleanErrors();
-            List<Token> tokens = scanner.ScanTokens();
-            if (WallE.HasErrors())
+            lexer = new Lexer(_codeEdit.Text);
+            List<Token> tokens = lexer.ScanTokens();
+            List<CompilerException> exceptions = lexer.GetCompilerExceptions();
+            if(exceptions.Count!=0) PrintExceptions(exceptions);
+            foreach (Token token in tokens)
             {
-                foreach (string errors in WallE.errors)
-                {
-                    _problems.Text += errors + "\n";
-                }
+                _problems.Text+=token;
             }
+        }
+    }
+    
+    private void PrintExceptions(List<CompilerException> exceptions)
+    {
+        foreach (CompilerException exception in exceptions)
+        {
+            _problems.Text += exception.ToString() + "\n";
         }
     }
     private void _on_back_button_down()
@@ -101,7 +112,6 @@ public partial class CompilerVisual : Node
     }
     private void ExportButtonPressed()
     {
-        
         dialog.FileMode = FileDialog.FileModeEnum.SaveFile;
         dialog.Title = "Guargar archivo";
         dialog.Show();

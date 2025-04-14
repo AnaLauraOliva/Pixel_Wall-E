@@ -182,6 +182,7 @@ grow_vertical = 2
 [node name="CodeEdit" type="CodeEdit" parent="TextContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/word_highlighted_color = Color(0, 0, 0, 0.721569)
 theme_override_fonts/font = ExtResource("2_nveu8")
 theme_override_font_sizes/font_size = 20
 theme_override_colors/line_number_color = Color(0.932625, 0.932625, 0.932625, 1)
@@ -314,6 +315,7 @@ grow_vertical = 0
 [node name="ProblemsDisplayer" type="TextEdit" parent="ProblemsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_readonly_color = Color(0.606626, 0.606626, 0.606626, 1)
 editable = false
 
 [node name="ExportOrImport" type="PopupPanel" parent="."]

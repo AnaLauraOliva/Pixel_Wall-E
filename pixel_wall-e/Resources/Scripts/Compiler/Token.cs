@@ -1,20 +1,23 @@
 public enum TokenType
 {
-    //Operadores y símbolos de un caracter
+    //Operator and symbols
     PLUS, MINUS, SLASH, MODULE, COMMA, LEFT_PAREN, RIGHT_PAREN, LEFT_SQUARE_BRACE, RIGHT_SQUARE_BRACE, LEFT_CURLY_BRACE, RIGHT_CURLY_BRACE, LESS, GREATER, BY, NOT,
     //+   -      /      %       ,      (           )            [                  ]                   {                 }                  <     >        *   !
 
-    //Tokens de dos caracteres
+    //Two Characters tokens
     ASSIGNMENT, LESS_EQUAL, GREATER_EQUAL, POW, MINUS_ASSIGN, PLUS_ASSIGN, BY_ASSIGN, DIVIDE_ASSIGN, MODULE_ASSIGN, EQUAL_EQUAL, OR, AND, SIMPLE_COMMENT, LEFT_MULTILINE_COMMENT, NOT_EQUAL,
     //<-        <=          >=             **   -=            +=           *=         /=             %=             ==           ||  &&   //              /*                      !=
 
-    //Literales
+    //Literals
     IDENTIFIER, STRING, INT,
 
     //keywords
-    GOTO, WHILE, FOR, IF, ELSE, FUNCTION,
+    GOTO, WHILE, FOR, IF, ELSE, ELIF, FUNCTION, LABEL,
+    //wall-e functions
+    SPAWN, COLOR, SIZE, DRAWLINE, DRAWCIRCLE, DRAWRECTANGLE, FILL, GETACTUALX, GETACTUALY, GETCANVASSIZE, GETCOLORCOUNT, ISBRUSHCOLOR, ISBRUSHSIZE, ISCANVASCOLOR,
+    EOL,//end of line
 
-    EOF//fin del archivo
+    EOF//end of file
 }
 public class Token
 {
@@ -31,6 +34,7 @@ public class Token
         Literal = literal;
         Line = line;
         Column = column;
+
     }
 
     public override string ToString()
