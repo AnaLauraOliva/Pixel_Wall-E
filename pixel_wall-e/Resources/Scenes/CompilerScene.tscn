@@ -48,54 +48,30 @@ texture = SubResource("GradientTexture2D_8qigt")
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.444
+anchor_right = 0.463
 anchor_bottom = 1.0
-offset_right = 21.512
+offset_right = -0.376038
 grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("2_y2a8r")
 
-[node name="WidthLbl" type="Label" parent="CanvasPanel"]
-layout_mode = 1
-offset_left = 3.0
-offset_top = 19.0
-offset_right = 68.0
-offset_bottom = 49.0
-theme_override_constants/line_spacing = 0
-theme_override_constants/outline_size = 8
-theme_override_fonts/font = ExtResource("2_nveu8")
-theme_override_font_sizes/font_size = 25
-text = "Ancho:"
-
-[node name="Width" type="LineEdit" parent="CanvasPanel"]
-layout_mode = 1
-offset_left = 72.0
-offset_top = 10.0
-offset_right = 180.0
-offset_bottom = 56.0
-theme_override_fonts/font = ExtResource("2_nveu8")
-theme_override_font_sizes/font_size = 32
-text = "32"
-placeholder_text = "Ancho"
-alignment = 1
-
-[node name="HeightLbl" type="Label" parent="CanvasPanel"]
+[node name="SizeLbl" type="Label" parent="CanvasPanel"]
 layout_mode = 0
-offset_left = 191.0
+offset_left = 5.0
 offset_top = 18.0
-offset_right = 256.0
+offset_right = 97.0
 offset_bottom = 48.0
 theme_override_constants/line_spacing = 0
 theme_override_constants/outline_size = 8
 theme_override_fonts/font = ExtResource("2_nveu8")
 theme_override_font_sizes/font_size = 25
-text = "Largo:"
+text = "Tamaño:"
 
-[node name="Height" type="LineEdit" parent="CanvasPanel"]
+[node name="Size" type="LineEdit" parent="CanvasPanel"]
 layout_mode = 1
-offset_left = 259.0
+offset_left = 88.0
 offset_top = 9.0
-offset_right = 367.0
+offset_right = 196.0
 offset_bottom = 55.0
 theme_override_fonts/font = ExtResource("2_nveu8")
 theme_override_font_sizes/font_size = 32
@@ -105,9 +81,9 @@ alignment = 1
 
 [node name="ApplyBtn" type="Button" parent="CanvasPanel"]
 layout_mode = 0
-offset_left = 384.0
+offset_left = 213.0
 offset_top = 14.0
-offset_right = 507.0
+offset_right = 336.0
 offset_bottom = 52.0
 theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
@@ -354,5 +330,6 @@ text = "OK"
 auto_translate_mode = 1
 access = 2
 
+[connection signal="button_down" from="ButtonsContainer/Execute" to="." method="_on_execute_button_down"]
 [connection signal="button_down" from="ButtonsContainer/Back" to="." method="_on_back_button_down"]
 [connection signal="button_down" from="ButtonsContainer/Exit" to="." method="_on_exit_button_down"]

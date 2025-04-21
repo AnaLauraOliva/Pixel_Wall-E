@@ -33,7 +33,10 @@ class Lexer
         {"GetColorCount", TokenType.GETCOLORCOUNT},
         {"IsBrushColor", TokenType.ISBRUSHCOLOR},
         {"IsBrushSize", TokenType.ISBRUSHSIZE},
-        {"IsCanvasColor", TokenType.ISCANVASCOLOR}
+        {"IsCanvasColor", TokenType.ISCANVASCOLOR},
+        {"true", TokenType.TRUE},
+        {"false", TokenType.FALSE},
+        {"return", TokenType.RETURN}
     };
     //Symbols
     private Dictionary<string, TokenType> _symbolTokens = new Dictionary<string, TokenType>{
@@ -47,6 +50,7 @@ class Lexer
         {"+", TokenType.PLUS},
         {"-", TokenType.MINUS},
         {"%", TokenType.MODULE},
+        {"√", TokenType.ROOT},
         {"/", TokenType.SLASH},
         {"<", TokenType.LESS},
         {">", TokenType.GREATER},
@@ -56,11 +60,6 @@ class Lexer
         {"<=", TokenType.LESS_EQUAL},
         {">=", TokenType.GREATER_EQUAL},
         {"**", TokenType.POW},
-        {"+=", TokenType.PLUS_ASSIGN},
-        {"-=", TokenType.MINUS_ASSIGN},
-        {"*=", TokenType.BY_ASSIGN},
-        {"/=", TokenType.DIVIDE_ASSIGN},
-        {"%=", TokenType.MODULE_ASSIGN},
         {"==", TokenType.EQUAL_EQUAL},
         {"||", TokenType.OR},
         {"&&", TokenType.AND},
@@ -142,9 +141,10 @@ class Lexer
             Identifier();
             return;
         }
+        AddToken(TokenType.UNKNOWN);
         Exceptions.Add(new CompilerException("Lexical", $"Unexpected character", _line, _column++, x.ToString()));
     }
-    //Verifying that theidentifier didn't start with - or numbers
+    //Verifying that the identifier didn't start with - or numbers
     private bool NoStartsWithNumberOrHype()
     {
         if (IsAtEnd()) return true;
@@ -179,7 +179,7 @@ class Lexer
             _current++;
         }
     }
-    
+
     private bool Match(char expected)
     {
         if (_current + 1 >= _source.Length) return false;
@@ -206,13 +206,9 @@ class Lexer
     {
         while (char.IsLetterOrDigit(Peek()) || Peek() == '-') _current++;
         string text = _source.Substring(_start, _current - _start);
-        if (!IsAtEnd()&&_source[_current] == '\n')
-            AddToken(TokenType.LABEL);
-        else
-        {
-            TokenType type = _keywords.TryGetValue(text, out TokenType value) ? value : TokenType.IDENTIFIER;
-            AddToken(type);
-        }
+
+        TokenType type = _keywords.TryGetValue(text, out TokenType value) ? value : TokenType.IDENTIFIER;
+        AddToken(type);
     }
 
     private void String()

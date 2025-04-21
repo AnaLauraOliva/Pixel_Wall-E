@@ -6,15 +6,19 @@ public class Handler
     private readonly string _source;
     private List<CompilerException> _exceptions;
     private List<Token> _tokens;
+    private List<Stmt> _statements;
+    Interpreter interpreter;
     public Handler(string source)
     {
         _source = source;
         _exceptions= new List<CompilerException>();
         _tokens = new List<Token>();
+        _statements = new List<Stmt>();
+        interpreter = new Interpreter();
         HandleLexer();
         if(_exceptions.Count==0)
         {
-
+            HandleParser();
         }
     }
     public List<CompilerException> GetExceptions()=>_exceptions;
@@ -23,5 +27,15 @@ public class Handler
         Lexer lexer = new Lexer(_source);
         _tokens = lexer.ScanTokens();
         _exceptions = lexer.GetCompilerExceptions();
+    }
+    private void HandleParser()
+    {
+        Parser parser = new Parser(_tokens);
+        _statements= parser.parse();
+        _exceptions = parser.GetCompilerExceptions();
+    }
+    public void Interpret()
+    {
+        interpreter.Interpret(_statements);
     }
 }

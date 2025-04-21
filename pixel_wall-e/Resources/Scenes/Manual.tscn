@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=3 uid="uid://dnbwfnfftqg45"]
+
+[ext_resource type="Texture2D" uid="uid://u7rltpd4sibi" path="res://Resources/Images/wall_e.png" id="1_1s64j"]
+
+[sub_resource type="Gradient" id="Gradient_i2ggv"]
+offsets = PackedFloat32Array(0.00869565, 0.573913)
+colors = PackedColorArray(0.721569, 0.207843, 1, 1, 1, 0.83178, 0.955498, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hgcox"]
+gradient = SubResource("Gradient_i2ggv")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorBackground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_hgcox")
+
+[node name="BackgroundImage" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.164706)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_1s64j")
+expand_mode = 1
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.108
+anchor_right = 0.879
+anchor_bottom = 1.0
+offset_left = 6.584
+offset_right = 8.39191
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.114
+anchor_bottom = 1.0
+offset_right = -0.328003
+grow_vertical = 2
+
+[node name="RButtons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.886
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.327942
+grow_horizontal = 0
+grow_vertical = 2
