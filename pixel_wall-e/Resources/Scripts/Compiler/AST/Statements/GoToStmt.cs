@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 public class GoToStmt : Stmt
 {
-    public LabelStmt Name { get; }
+    public Token Label { get; }
     public Expression Condition { get; }
 
 
-    public GoToStmt(LabelStmt Name, Expression Condition)
+    public GoToStmt(Token label, Expression Condition)
     {
-        this.Name = Name;
+        this.Label = label;
         this.Condition = Condition;
 
     }

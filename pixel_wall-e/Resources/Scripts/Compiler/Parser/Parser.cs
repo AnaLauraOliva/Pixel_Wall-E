@@ -4,6 +4,7 @@ using System.Drawing;
 
 public class Parser
 {
+    private class ParseError:Exception{}
     private readonly List<Token> _tokens;
     private List<CompilerException> exceptions;
     private int _current = 0;
@@ -65,12 +66,6 @@ public class Parser
         List<Stmt> statements = new List<Stmt>();
         while (!IsAtEnd())
         {
-            while (check(TokenType.EOL))
-            {
-                Advance();
-                if(IsAtEnd())return statements;
-                
-            }
             counter = _current;
             statements.Add(declaration());
             if (counter == _current)
@@ -85,7 +80,7 @@ public class Parser
         try
         {
             if (match(TokenType.IDENTIFIER))
-            { 
+            {
                 return VarDeclaration();
             }
             return Statement();
@@ -103,10 +98,9 @@ public class Parser
         if (IsAtEnd() || check(TokenType.EOL)) return new LabelStmt(name);
         consume(TokenType.ASSIGNMENT, "Expected <- after variable name");
         Expression initializer = expression();
-        if(initializer is Literal && ((Literal)initializer).Value is string)
+        if (initializer is Literal && ((Literal)initializer).Value is string)
         {
-            ParseError(name,"the value of the variable cannot be a string");
-            initializer = null;
+            throw error(name, "the value of the variable cannot be a string");
         }
         if (peek().Type != TokenType.EOF)
             consume(TokenType.EOL, @"Expected line break ('\n') at end of statement");
@@ -114,6 +108,8 @@ public class Parser
     }
     private Stmt Statement()
     {
+        if (peek().Type == TokenType.EOL)
+        { Advance(); }
         if (match(TokenType.COLOR)) return ColorStatement();
         if (match(TokenType.DRAWCIRCLE)) return DrawCircleStatement();
         if (match(TokenType.DRAWLINE)) return DrawLineStatement();
@@ -122,13 +118,92 @@ public class Parser
         if (match(TokenType.SIZE)) return SizeStatement();
         if (match(TokenType.SPAWN)) return SpawnStatement();
         if (match(TokenType.LEFT_CURLY_BRACE)) return new BlockStmt(block());
+        if (match(TokenType.IF)) return ifStatement();
+        if (match(TokenType.WHILE)) return whileStatement();
+        if (match(TokenType.GOTO)) return GoToStatement();
+        if (match(TokenType.FOR)) return ForStatement();
         return ExpressionStatement();
+    }
+    private Stmt ForStatement()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'");
+        Stmt initializer;
+        if(match(TokenType.COMMA))initializer=null;
+        else if(match(TokenType.IDENTIFIER))
+        {
+            initializer = VarDeclaration();
+        }
+        else initializer = ExpressionStatement();
+        Expression condition = null;
+        if(!check(TokenType.COMMA)) condition=expression();
+        consume(TokenType.COMMA, "Expect ',' after loop condition");
+        Expression increment = null;
+        if(!check(TokenType.RIGHT_PAREN))
+        increment = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after for clauses");
+        Stmt body = Statement();
+        if(increment!=null)
+        {
+            body = new BlockStmt(
+                new List<Stmt>(){body,new ExpressionStmt(increment)}
+            );
+        }
+        if(condition==null)condition = new Literal(true);
+        body = new WhileStmt(condition,body);
+        if(initializer!=null)
+        body = new BlockStmt(new List<Stmt>(){initializer,body});
+        return body;
+
+    }
+    private Stmt GoToStatement()
+    {
+        consume(TokenType.LEFT_SQUARE_BRACE, "Expect '[' after 'GoTo'");
+        consume(TokenType.IDENTIFIER, "Expect Label after '['");
+        Token label = null;
+        if (previous().Type == TokenType.IDENTIFIER) label = previous();
+        consume(TokenType.RIGHT_SQUARE_BRACE, "Expect ']' after Label");
+        consume(TokenType.LEFT_PAREN, "Expect '(' after ']' in GoTo");
+        Expression expr = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after condition");
+        if (peek().Type != TokenType.EOF)
+            consume(TokenType.EOL, @"Expected line break ('\n') at end of statement");
+        return new GoToStmt(label, expr);
+    }
+    private Stmt whileStatement()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'");
+        Expression condition = expression();
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after condition");
+        Stmt body = Statement();
+        return new WhileStmt(condition, body);
+    }
+    private Stmt ifStatement()
+    {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'");
+        Expression condition = expression();
+        consume(TokenType.RIGHT_PAREN, "Expected ')' after if condition");
+        if (check(TokenType.EOL)) Advance();
+        Stmt thenBranch = Statement();
+        Stmt elseBanch = null;
+        if (match(TokenType.ELIF))
+        {
+            elseBanch = ifStatement();
+        }
+        if (match(TokenType.ELSE))
+        {
+            elseBanch = Statement();
+        }
+        return new IfStmt(condition, thenBranch, elseBanch);
     }
     private List<Stmt> block()
     {
         List<Stmt> statements = new List<Stmt>();
         while (!check(TokenType.RIGHT_CURLY_BRACE) && !IsAtEnd())
         {
+            while (check(TokenType.EOL))
+            {
+                Advance();
+            }
             statements.Add(declaration());
         }
         consume(TokenType.RIGHT_CURLY_BRACE, "Expected '}' after block.");
@@ -224,7 +299,7 @@ public class Parser
         Token key = previous();
         consume(TokenType.LEFT_PAREN, "( expected after Color instruction");
         Expression expr = expression();
-        if (expr is not null && (expr is not Literal || ((Literal)expr).Value is not string)) ParseError(previous(),"The argument of Color instruction must be a string");
+        if (expr is not null && (expr is not Literal || ((Literal)expr).Value is not string)) throw error(previous(), "The argument of Color instruction must be a string");
         consume(TokenType.RIGHT_PAREN, ") expected after ");
         if (peek().Type != TokenType.EOF)
             consume(TokenType.EOL, @"Expected line break ('\n') at end of statement");
@@ -248,7 +323,7 @@ public class Parser
     }
     private Expression assignment()
     {
-        Expression expr = equality();
+        Expression expr = and();
         if (match(TokenType.ASSIGNMENT))
         {
             Token equals = previous();
@@ -258,9 +333,31 @@ public class Parser
                 Token name = ((Variable)expr).Name;
                 return new Assign(name, value);
             }
-            ParseError(equals,"Invalid assignment target");
+            throw error(equals, "Invalid assignment target");
         }
         return expr;
+    }
+    private Expression and()
+    {
+        Expression expression = or();
+        while (match(TokenType.AND))
+        {
+            Token @operator = previous();
+            Expression right = or();
+            expression = new Logical(expression, @operator, right);
+        }
+        return expression;
+    }
+    private Expression or()
+    {
+        Expression expression = equality();
+        while (match(TokenType.OR))
+        {
+            Token @operator = previous();
+            Expression right = equality();
+            expression = new Logical(expression, @operator, right);
+        }
+        return expression;
     }
     private Expression equality()
     {
@@ -298,7 +395,7 @@ public class Parser
     private Expression factor()
     {
         Expression expression = powRoot();
-        while (match(new List<TokenType> { TokenType.BY, TokenType.SLASH }))
+        while (match(new List<TokenType> { TokenType.BY, TokenType.SLASH, TokenType.MODULE }))
         {
             Token @operator = previous();
             Expression right = powRoot();
@@ -371,8 +468,7 @@ public class Parser
                             return new Literal(x.Literal.ToString());
                         else
                         {
-                            ParseError(x,"Invalid Color or hex code");
-                            return null;
+                            throw error(x, "Invalid Color or hex code");
                         }
 
                 }
@@ -387,8 +483,7 @@ public class Parser
 
         }
         Token aux = peek();
-        ParseError(aux,"Expected expression");
-        return null;
+        throw error(aux, "Expected expression");
     }
     private void consume(TokenType type, string message)
     {
@@ -396,7 +491,7 @@ public class Parser
         else
         {
             Token aux = peek();
-            exceptions.Add(new CompilerException("Syntactical", message, aux.Line, aux.Column, aux.Type == TokenType.EOF ? "at end" : aux.Lexeme));
+            throw error(peek(),message);
         }
     }
     private bool match(List<TokenType> types)
@@ -435,8 +530,8 @@ public class Parser
     private bool IsAtEnd() => peek().Type == TokenType.EOF;
     private Token peek() => _tokens[_current];
     private Token previous() => _tokens[_current - 1];
-    private void ParseError(Token token, string message)
+    private CompilerException error(Token token, string message)
     {
-        exceptions.Add(new CompilerException("Syntactical", message,token.Line, token.Column, token.Lexeme));
+        return new CompilerException("Syntactical", message, token.Line, token.Column, token.Lexeme);
     }
 }
