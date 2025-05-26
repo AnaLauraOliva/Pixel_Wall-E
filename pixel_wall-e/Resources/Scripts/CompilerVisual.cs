@@ -38,7 +38,7 @@ public partial class CompilerVisual : Node
         export.Pressed += ExportButtonPressed;
         import.Pressed += ImportButtonPressed;
 
-        script= GetNode<CanvasPanelscript>("CanvasPanel");
+        script = GetNode<CanvasPanelscript>("CanvasPanel");
     }
     private void Compile()
     {
@@ -56,7 +56,6 @@ public partial class CompilerVisual : Node
             }
             else
             {
-                canCompile = true;
                 Parser parser = new Parser(_tokens);
                 statements = parser.parse();
                 exceptions = parser.GetCompilerExceptions();
@@ -64,10 +63,19 @@ public partial class CompilerVisual : Node
                 {
                     PrintExceptions(exceptions);
                     canCompile = false;
+
                 }
                 else
                 {
                     canCompile = true;
+                    SemanticAnalyzer semantic = new SemanticAnalyzer(statements);
+                    semantic.Analyze();
+                    exceptions = semantic.exceptions;
+                    if (exceptions.Count != 0)
+                    {
+                        canCompile = false;
+                        PrintExceptions(exceptions);
+                    }
                 }
             }
         }
@@ -111,10 +119,9 @@ public partial class CompilerVisual : Node
             {
                 _problems.Text = "Compilado correctamente";
                 script.ExecuteCommandQueue(Canvas.getQueue());
-                Canvas.QuitInstructionsInTheQueue();
-                
             }
         }
+        Canvas.QuitInstructionsInTheQueue();
     }
     private string PrintAST(Expression expression)
     {

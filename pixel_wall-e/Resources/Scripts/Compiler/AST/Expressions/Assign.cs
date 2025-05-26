@@ -4,12 +4,13 @@ public class Assign:Expression
     {
         Name = name;
         Value = value;
+        type = Value.type;
     }
 
     public Token Name { get; }
     public Expression Value { get; }
 
-    public override object Accept(IExpressionVisitor visitor)
+    public override object Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitAssignExpression(this);
     }

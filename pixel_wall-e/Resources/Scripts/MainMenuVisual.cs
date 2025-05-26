@@ -34,4 +34,8 @@ public partial class MainMenuVisual : Node
 		menu.Visible = true;
 		about.Visible = false;
 	}
+	public void _on_documentation_btn_pressed()
+	{
+		GetTree().ChangeSceneToPacked((PackedScene)ResourceLoader.Load("res://Resources/Scenes/Manual.tscn"));
+	}
 }

@@ -195,6 +195,7 @@ theme_override_font_sizes/font_size = 25
 text = "Atrás"
 
 [connection signal="button_down" from="vbcMenu/StartBtn" to="." method="_on_start_btn_button_down"]
+[connection signal="pressed" from="vbcMenu/DocumentationBtn" to="." method="_on_documentation_btn_pressed"]
 [connection signal="button_down" from="vbcMenu/AboutBtn" to="." method="_on_about_btn_button_down"]
 [connection signal="button_down" from="vbcMenu/ExitBtn" to="." method="_on_exit_btn_button_down"]
 [connection signal="button_down" from="AboutPanel/BackBtn" to="." method="_on_back_btn_button_down"]

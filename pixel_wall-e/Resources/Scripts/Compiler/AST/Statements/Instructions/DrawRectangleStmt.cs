@@ -22,7 +22,7 @@ public class DrawRectangleStmt : Stmt
         this.keyword = keyword;
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitDrawRectangleStmt(this);
     }

@@ -18,7 +18,7 @@ public class DrawLineStmt : Stmt
         this.keyword = keyword;
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitDrawLineStmt(this);
     }

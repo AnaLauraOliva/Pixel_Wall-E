@@ -12,11 +12,10 @@ public enum TokenType
     IDENTIFIER, STRING, INT,
 
     //keywords
-    GOTO, WHILE, FOR, IF, ELSE, ELIF, FUNCTION, RETURN, TRUE, FALSE,
+    GOTO, WHILE, FOR, IF, ELSE, FUNCTION, RETURN, TRUE, FALSE,
     //wall-e functions
     SPAWN, COLOR, SIZE, DRAWLINE, DRAWCIRCLE, DRAWRECTANGLE, FILL, GETACTUALX, GETACTUALY, GETCANVASSIZE, GETCOLORCOUNT, ISBRUSHCOLOR, ISBRUSHSIZE, ISCANVASCOLOR,
     EOL,//end of line
-    UNKNOWN,//The token isn't recognized
     EOF//end of file
 }
 public class Token

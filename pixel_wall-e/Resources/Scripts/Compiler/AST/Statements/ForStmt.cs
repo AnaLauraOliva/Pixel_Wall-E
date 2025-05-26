@@ -18,7 +18,7 @@ public class ForStmt : Stmt
 
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitForStmt(this);
     }

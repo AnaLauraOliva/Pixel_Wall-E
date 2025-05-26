@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Drawing;
+using System.Text.RegularExpressions;
 class Lexer
 {
     public string _source;
@@ -18,8 +19,7 @@ class Lexer
         {"for", TokenType.FOR},
         {"if", TokenType.IF},
         {"else", TokenType.ELSE},
-        {"function", TokenType.FUNCTION},
-        {"elif", TokenType.ELIF},
+        {"func", TokenType.FUNCTION},
         {"Spawn", TokenType.SPAWN},
         {"Color", TokenType.COLOR},
         {"Size", TokenType.SIZE},
@@ -27,13 +27,13 @@ class Lexer
         {"DrawCircle", TokenType.DRAWCIRCLE},
         {"DrawRectangle", TokenType.DRAWRECTANGLE},
         {"Fill", TokenType.FILL},
-        {"GetActualX", TokenType.GETACTUALX},
-        {"GetActualY", TokenType.GETACTUALY},
-        {"GetCanvasSize", TokenType.GETCANVASSIZE},
-        {"GetColorCount", TokenType.GETCOLORCOUNT},
-        {"IsBrushColor", TokenType.ISBRUSHCOLOR},
-        {"IsBrushSize", TokenType.ISBRUSHSIZE},
-        {"IsCanvasColor", TokenType.ISCANVASCOLOR},
+        //{"GetActualX", TokenType.GETACTUALX},
+        //{"GetActualY", TokenType.GETACTUALY},
+        //{"GetCanvasSize", TokenType.GETCANVASSIZE},
+        //{"GetColorCount", TokenType.GETCOLORCOUNT},
+        //{"IsBrushColor", TokenType.ISBRUSHCOLOR},
+        //{"IsBrushSize", TokenType.ISBRUSHSIZE},
+        //{"IsCanvasColor", TokenType.ISCANVASCOLOR},
         {"true", TokenType.TRUE},
         {"false", TokenType.FALSE},
         {"return", TokenType.RETURN}
@@ -119,10 +119,6 @@ class Lexer
         }
         if (_symbolTokens.TryGetValue(x.ToString(), out TokenType _type))
         {
-            if (_type == TokenType.MINUS && !NoStartsWithNumberOrHype())
-            {
-                return;
-            }
             AddToken(_type);
             return;
         }
@@ -131,29 +127,32 @@ class Lexer
             String();
             return;
         }
-        if (char.IsDigit(x))
+        if (Regex.IsMatch(x.ToString(), @"[0-9]"))
         {
             Number();
             return;
         }
-        if (char.IsLetter(x))
+        if (Regex.IsMatch(x.ToString(),@"^[a-zA-ZáéíóúÁÉÍÓÚñÑ]"))
         {
             Identifier();
             return;
         }
-        AddToken(TokenType.UNKNOWN);
+        if(x=='_')
+        {
+            while(!IsAtEnd()&&Regex.IsMatch(Peek().ToString(), @"^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_]")) _current++;
+            Exceptions.Add(new CompilerException("Lexical", "Invalid Identifier. Identifiers cannot start with underscore", _line,_column, _source.Substring(_start, _current-_start)));
+            return;
+        }
         Exceptions.Add(new CompilerException("Lexical", $"Unexpected character", _line, _column++, x.ToString()));
     }
-    //Verifying that the identifier didn't start with - or numbers
-    private bool NoStartsWithNumberOrHype()
+    //Verifying that the identifier didn't start with numbers
+    private bool NoStartsWithNumber()
     {
         if (IsAtEnd()) return true;
         if (!char.IsLetter(_source[_current]))
             return true;
         while (!IsAtEnd() && char.IsLetter(_source[_current])) _current++;
-        Exceptions.Add(new CompilerException("Lexical", "Invalid Identifier. Identifiers cannot start with " +
-         (char.IsDigit(_source[_start]) ? "numbers" : "hypers"), _line, _column, _source.Substring(_start, _current - _start)));
-        AddToken(TokenType.UNKNOWN);
+        Exceptions.Add(new CompilerException("Lexical", "Invalid Identifier. Identifiers cannot start with numbers", _line, _column, _source.Substring(_start, _current - _start)));
         return false;
     }
     //Adding only line and multi line to the lenguage
@@ -197,20 +196,20 @@ class Lexer
     private char Peek() => IsAtEnd() ? '\0' : _source[_current];
     private void Number()
     {
-        while (char.IsDigit(Peek())) _current++;
-        if (NoStartsWithNumberOrHype())
-            AddToken(TokenType.INT, int.Parse(_source.Substring(_start, _current - _start)));
+        while (Regex.IsMatch(Peek().ToString(),"[0-9]")) _current++;
+        if (NoStartsWithNumber())
+            AddToken(TokenType.INT, double.Parse(_source.Substring(_start, _current - _start)));
 
     }
     private void Identifier()
     {
-        while (char.IsLetterOrDigit(Peek()) || Peek() == '-') _current++;
+        while (Regex.IsMatch(Peek().ToString(), @"^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_]")) _current++;
+        //About regex: ^ begging of the string(in this case is not necesary because I am working with a char but I will use it anyway), in this case the char, [] valid characters
         string text = _source.Substring(_start, _current - _start);
 
         TokenType type = _keywords.TryGetValue(text, out TokenType value) ? value : TokenType.IDENTIFIER;
         AddToken(type);
     }
-
     private void String()
     {
         while (Peek() != '"' && !IsAtEnd())

@@ -16,7 +16,7 @@ public class FunctionStmt : Stmt
 
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitFunctionStmt(this);
     }

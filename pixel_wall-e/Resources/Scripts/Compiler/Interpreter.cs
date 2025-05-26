@@ -1,15 +1,44 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
-public class Interpreter : IExpressionVisitor, IStatementVisitor
+public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
 {
     private LabelTable labels = new LabelTable();
-    private Environment environment = new Environment();
+    private Environment environment;
     public List<RunTimeError> exceptions = new List<RunTimeError>();
     int current = 0;
+    public Interpreter()
+    {
+        environment = new Environment();
+        environment.defineNative("GetActualX", new NativeFunctions(0, _ => Canvas.GetActualX()));//_=> ignores args and returns Canvas.GetActualX
+        environment.defineNative("GetActualY", new NativeFunctions(0, _ => Canvas.GetActualY()));
+        environment.defineNative("GetCanvasSize", new NativeFunctions(0, _ => Canvas.GetCanvasSize()));
+        environment.defineNative("GetColorCount", new NativeFunctions(5, args =>
+        {
+            var color = args[0] as string;
+            var x1 = Convert.ToInt32(args[1]);
+            var y1 = Convert.ToInt32(args[2]);
+            var x2 = Convert.ToInt32(args[3]);
+            var y2 = Convert.ToInt32(args[4]);
+            return Canvas.GetColorCount(color, x1, y1, x2, y2);
+        }
+        ));
+        environment.defineNative("IsBrushColor", new NativeFunctions(1, args =>
+        {
+            return Canvas.IsBrushColor(args[0] as string);
+        }));
+        environment.defineNative("IsBrushSize", new NativeFunctions(1, args =>
+        {
+            return Canvas.IsBrushSize(Convert.ToInt32(args[0]));
+        }));
+        environment.defineNative("IsCanvasColor", new NativeFunctions(3, args => Canvas.IsCanvasColor(args[0] as string, Convert.ToInt32(args[1]), Convert.ToInt32(args[2]))));
+        
+    }
     public void Interpret(List<Stmt> Statements)
     {
+        Canvas.MakePrevious();
         try
         {
             for (int i = 0; i < Statements.Count; i++)
@@ -28,7 +57,7 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         }
         catch (RunTimeError error)
         {
-
+            Canvas.BackToPrevious();
             exceptions.Add(error);
         }
     }
@@ -47,7 +76,7 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         return ob.ToString();
     }
     #region Expressions
-    public object visitLiteralExpression(Literal expression) => expression.Value is IConvertible ? Convert.ToInt32(expression.Value) : expression.Value;
+    public object visitLiteralExpression(Literal expression) => int.TryParse(expression.Value.ToString(), out int value)? value : expression.Value;
     public object visitGroupingExpression(Grouping expression) => Evaluate(expression.Expression);
     private object Evaluate(Expression expression) => expression.Accept(this);
     public object visitUnaryExpression(Unary expression)
@@ -88,8 +117,10 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
                 checkNumberOperands(expression.Operator, leftBranch, rightBranch);
                 return (int)leftBranch <= (int)rightBranch;
             case TokenType.NOT_EQUAL:
+                checkNumberOperands(expression.Operator, leftBranch, rightBranch);
                 return !IsEqual(leftBranch, rightBranch);
             case TokenType.EQUAL_EQUAL:
+                checkNumberOperands(expression.Operator, leftBranch, rightBranch);
                 return IsEqual(leftBranch, rightBranch);
             case TokenType.MINUS:
                 checkNumberOperands(expression.Operator, leftBranch, rightBranch);
@@ -128,9 +159,7 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
     }
     private void checkNumberOperands(Token @operator, object left, object right)
     {
-
         if (left is Int32 && right is Int32) return;
-
         throw new RunTimeError(@operator, "Operands must be numbers");
     }
 
@@ -143,7 +172,25 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
 
     public object visitCallExpression(Call expression)
     {
-        throw new NotImplementedException();
+        object callee = expression.Callee;
+        if(callee is not Variable) throw new RunTimeError(expression.Paren,"Callee must be an identifier");
+        callee = environment.GetFunc(((Variable)callee).Name);
+        List<object> arguments = new List<object>();
+        foreach (Expression arg in expression.Arguments)
+        {
+            arguments.Add(Evaluate(arg));
+        }
+        if (!(callee is IPixelWallECallable))
+        {
+            throw new RunTimeError(expression.Paren, "You can only call functions");
+        }
+
+        IPixelWallECallable function = (IPixelWallECallable)callee;
+        if (arguments.Count != function.Arity())
+        {
+            throw new RunTimeError(expression.Paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+        }
+        return function.Call(this, arguments);
     }
 
     public object visitLogicalExpression(Logical expression)
@@ -166,9 +213,10 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
     }
     #endregion
     #region stmts
-    public void visitBlockStmt(BlockStmt stmt)
+    public object visitBlockStmt(BlockStmt stmt)
     {
         executeBlock(stmt.Statements, new Environment(environment));
+        return null;
     }
     private void executeBlock(List<Stmt> statements, Environment environment)
     {
@@ -188,20 +236,21 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         }
     }
 
-    public void visitExpressionStmt(ExpressionStmt stmt)
+    public object visitExpressionStmt(ExpressionStmt stmt)
     {
         Evaluate(stmt.Expr);
+        return null;
     }
 
-    public void visitFunctionStmt(FunctionStmt stmt)
+    public object visitFunctionStmt(FunctionStmt stmt)
     {
         throw new NotImplementedException();
     }
 
-    public void visitIfStmt(IfStmt stmt)
+    public object visitIfStmt(IfStmt stmt)
     {
         if (isTrue(Evaluate(stmt.condition)))
-        {
+        {/*
             if (stmt.thenBranch is BlockStmt)
             {
                 foreach (Stmt statement in ((BlockStmt)stmt.thenBranch).Statements)
@@ -209,11 +258,11 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
                     execute(statement);
                 }
             }
-            else
+            else*/
             execute(stmt.thenBranch);
         }
         else if (stmt.elseBranch != null)
-        {
+        {/*
             if (stmt.elseBranch is BlockStmt)
             {
                 foreach (Stmt statement in ((BlockStmt)stmt.elseBranch).Statements)
@@ -221,68 +270,80 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
                     execute(statement);
                 }
             }
-            else execute(stmt.elseBranch);
+            else */
+            execute(stmt.elseBranch);
         }
+        return null;
     }
 
-    public void visitReturnStmt(ReturnStmt stmt)
+    public object visitReturnStmt(ReturnStmt stmt)
     {
         throw new NotImplementedException();
     }
 
-    public void visitGoToStmt(GoToStmt stmt)
+    public object visitGoToStmt(GoToStmt stmt)
     {
         int index = labels.GetPosition(stmt.Label);
+        stmt.maxRepetition--;
+        if (stmt.maxRepetition<=0) throw new RunTimeError(stmt.Keyword, "Infinit Loop");
         object condition = Evaluate(stmt.Condition);
         if (isTrue(condition))
         {
             current = index;
         }
+        return null;
     }
 
-    public void visitWhileStmt(WhileStmt stmt)
+    public object visitWhileStmt(WhileStmt stmt)
     {
+        int maxRepetition = 10000000;
         while (isTrue(Evaluate(stmt.Condition)))
         {
-            if (stmt.Body is BlockStmt)
+            /*if (stmt.Body is BlockStmt)
             {
                 foreach (Stmt statement in ((BlockStmt)stmt.Body).Statements)
                 {
                     execute(statement);
                 }
             }
-            else
+            else*/
+            maxRepetition--;
+            if (maxRepetition <= 0) throw new RunTimeError(stmt.keyword, "Endles cycle");
             execute(stmt.Body);
         }
+        return null;
     }
-    public void visitForStmt(ForStmt stmt)
+    public object visitForStmt(ForStmt stmt)
     {
         throw new NotImplementedException();
     }
 
-    public void visitSpawnStmt(SpawnStmt stmt)
+    public object visitSpawnStmt(SpawnStmt stmt)
     {
         object x = Evaluate(stmt.X);
         object y = Evaluate(stmt.Y);
         if (x is not int || y is not int) throw new RunTimeError(stmt.keyword, "Coordenates must be ints");
         if ((int)x < 0 || (int)y < 0 || (int)x >= Canvas.GetCanvasSize() || (int)y >= Canvas.GetCanvasSize()) throw new RunTimeError(stmt.keyword, "The Spawn position is out of the bounds of the canvas");
         Canvas.Spawn((int)x, (int)y);
+        return null;
     }
 
-    public void visitColorStmt(ColorStmt stmt)
+    public object visitColorStmt(ColorStmt stmt)
     {
         Canvas.ChangeColor(((Literal)stmt.ColorName).Value.ToString());
+        return null;
     }
 
-    public void visitSizeStmt(SizeStmt stmt)
+    public object visitSizeStmt(SizeStmt stmt)
     {
         object k = Evaluate(stmt.K);
         if (k is not int) throw new RunTimeError(stmt.keyword, "Size argument k must be an int");
         if ((int)k <= 0) throw new RunTimeError(stmt.keyword, "Size argument k must be greater than or equal to zero");
         Canvas.ChangeSize((int)k);
+        return null;
     }
 
-    public void visitDrawLineStmt(DrawLineStmt stmt)
+    public object visitDrawLineStmt(DrawLineStmt stmt)
     {
         object DirX = Evaluate(stmt.DirX);
         object DirY = Evaluate(stmt.DirY);
@@ -292,14 +353,32 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         if (Distance is not int) throw new RunTimeError(stmt.keyword, "DrawLine argument Distance must be an int");
         if ((int)DirX < -1 || (int)DirX > 1) throw new RunTimeError(stmt.keyword, "DrawLine argument DirX must be 1, 0 or -1");
         if ((int)DirY < -1 || (int)DirY > 1) throw new RunTimeError(stmt.keyword, "DrawLine argument DirY must be 1, 0 or -1");
-        if ((int)Distance <= 0) throw new RunTimeError(stmt.keyword, "DrawLine argument Distance must be greater than zero");
+        if (!ValidDir((int)DirX, (int)DirY)) throw new RunTimeError(stmt.keyword, "Not valid direction");
+        if ((int)Distance < 0) throw new RunTimeError(stmt.keyword, "DrawLine argument Distance must be greater than or equal to zero");
         int endPointX = Canvas.robot.X + (int)DirX * (int)Distance;
         int endPointY = Canvas.robot.Y + (int)DirY * (int)Distance;
         if (endPointX < 0 || endPointX >= Canvas.GetCanvasSize() || endPointY < 0 || endPointY >= Canvas.GetCanvasSize()) throw new RunTimeError(stmt.keyword, "If you paint that line Wall-E will be out of the bounds of the canvas");
         Canvas.DrawLine((int)DirX, (int)DirY, (int)Distance);
+        return null;
+    }
+    private bool ValidDir(int DirX, int DirY)
+    {
+        switch ((DirX, DirY))
+        {
+            case (-1, -1):
+            case (-1, 0):
+            case (-1, 1):
+            case (0, 1):
+            case (1, 1):
+            case (1, 0):
+            case (1, -1):
+            case (0, -1):
+                return true;
+        }
+        return false;
     }
 
-    public void visitDrawCircleStmt(DrawCircleStmt stmt)
+    public object visitDrawCircleStmt(DrawCircleStmt stmt)
     {
         object DirX = Evaluate(stmt.DirX);
         object DirY = Evaluate(stmt.DirY);
@@ -309,20 +388,23 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         if (Radius is not int) throw new RunTimeError(stmt.keyword, "DrawCircle argument Radius must be an int");
         if ((int)DirX < -1 || (int)DirX > 1) throw new RunTimeError(stmt.keyword, "DrawCircle argument DirX must be 1, 0 or -1");
         if ((int)DirY < -1 || (int)DirY > 1) throw new RunTimeError(stmt.keyword, "DrawCircle argument DirY must be 1, 0 or -1");
+        if (!ValidDir((int)DirX, (int)DirY)) throw new RunTimeError(stmt.keyword, "Not valid direction");
         if ((int)Radius <= 0) throw new RunTimeError(stmt.keyword, "DrawCircle argument Radius must be greater than zero");
         int endPointX = Canvas.robot.X + (int)DirX * (int)Radius;
         int endPointY = Canvas.robot.Y + (int)DirY * (int)Radius;
         if (endPointX < 0 || endPointX >= Canvas.GetCanvasSize() || endPointY < 0 || endPointY >= Canvas.GetCanvasSize()) throw new RunTimeError(stmt.keyword, "If you paint that circle Wall-E will be out of the bounds of the canvas");
         Canvas.DrawCircle((int)DirX, (int)DirY, (int)Radius);
+        return null;
     }
 
-    public void visitDrawRectangleStmt(DrawRectangleStmt stmt)
+    public object visitDrawRectangleStmt(DrawRectangleStmt stmt)
     {
         object DirX = Evaluate(stmt.DirX);
         object DirY = Evaluate(stmt.DirY);
         object Distance = Evaluate(stmt.Distance);
         object Width = Evaluate(stmt.Width);
         object Height = Evaluate(stmt.Height);
+        //Error control
         if (DirX is not int) throw new RunTimeError(stmt.keyword, "DrawRectangle argument DirX must be an int");
         if (DirY is not int) throw new RunTimeError(stmt.keyword, "DrawRectangle argument DirY must be an int");
         if (Distance is not int) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Distance must be an int");
@@ -330,29 +412,33 @@ public class Interpreter : IExpressionVisitor, IStatementVisitor
         if (Height is not int) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Height must be an int");
         if ((int)DirX < -1 || (int)DirX > 1) throw new RunTimeError(stmt.keyword, "DrawRectangle argument DirX must be 1, 0 or -1");
         if ((int)DirY < -1 || (int)DirY > 1) throw new RunTimeError(stmt.keyword, "DrawRectangle argument DirY must be 1, 0 or -1");
-        if ((int)Distance <= 0) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Distance must be greater than zero");
+        if (!ValidDir((int)DirX, (int)DirY)) throw new RunTimeError(stmt.keyword, "Not valid direction");
+        if ((int)Distance < 0) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Distance must be greater than or equal to zero");
         if ((int)Width <= 0) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Width must be greater than zero");
         if ((int)Height <= 0) throw new RunTimeError(stmt.keyword, "DrawRectangle argument Height must be greater than zero");
         int endPointX = Canvas.robot.X + (int)DirX * (int)Distance;
         int endPointY = Canvas.robot.Y + (int)DirY * (int)Distance;
         if (endPointX < 0 || endPointX >= Canvas.GetCanvasSize() || endPointY < 0 || endPointY >= Canvas.GetCanvasSize()) throw new RunTimeError(stmt.keyword, "If you paint that rectangle Wall-E will be out of the bounds of the canvas");
         Canvas.DrawRectangle((int)DirX, (int)DirY, (int)Distance, (int)Width, (int)Height);
+        return null;
     }
 
-    public void visitFillStmt(FillStmt stmt)
+    public object visitFillStmt(FillStmt stmt)
     {
         Canvas.Fill();
+        return null;
     }
 
-    public void visitLabelStmt(LabelStmt stmt)
+    public object visitLabelStmt(LabelStmt stmt)
     {
-
+        return null;
     }
 
-    public void visitVariableStmt(VariableStmt stmt)
+    public object visitVariableStmt(VariableStmt stmt)
     {
         object value = Evaluate(stmt.initializer);
         environment.define(stmt.Name.Lexeme, value);
+        return null;
     }
     #endregion
 }

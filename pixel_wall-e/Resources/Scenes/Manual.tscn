@@ -1,6 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://dnbwfnfftqg45"]
+[gd_scene load_steps=12 format=3 uid="uid://dnbwfnfftqg45"]
 
 [ext_resource type="Texture2D" uid="uid://u7rltpd4sibi" path="res://Resources/Images/wall_e.png" id="1_1s64j"]
+[ext_resource type="Script" uid="uid://cnij3mun7nx2w" path="res://Resources/Scripts/ManualVisual.cs" id="1_bafcn"]
+[ext_resource type="FontFile" uid="uid://21d6wdeaw6nh" path="res://Resources/Fonts/Bubblegum_Sans/BubblegumSans-Regular.ttf" id="3_h0pa5"]
+[ext_resource type="Texture2D" uid="uid://btfhnpflvnkj7" path="res://Resources/Styles/ButtonTextureHover.tres" id="4_13gpe"]
+[ext_resource type="Texture2D" uid="uid://d0785g8r3mwaj" path="res://Resources/Styles/ButtonTexturePressed.tres" id="5_j4jd0"]
+[ext_resource type="Texture2D" uid="uid://b5f50vv3alk28" path="res://Resources/Styles/ButtonsTexture.tres" id="6_cctnv"]
 
 [sub_resource type="Gradient" id="Gradient_i2ggv"]
 offsets = PackedFloat32Array(0.00869565, 0.573913)
@@ -9,6 +14,17 @@ colors = PackedColorArray(0.721569, 0.207843, 1, 1, 1, 0.83178, 0.955498, 1)
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_hgcox"]
 gradient = SubResource("Gradient_i2ggv")
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_00lsx"]
+texture = ExtResource("4_13gpe")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dbils"]
+texture = ExtResource("5_j4jd0")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_a3tmx"]
+resource_local_to_scene = true
+texture = ExtResource("6_cctnv")
+region_rect = Rect2(0, -0.5, 64.5, 64.5)
+
 [node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -16,6 +32,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_bafcn")
 
 [node name="ColorBackground" type="TextureRect" parent="."]
 layout_mode = 1
@@ -40,28 +57,204 @@ expand_mode = 1
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.108
-anchor_right = 0.879
+anchor_left = 0.17
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.584
-offset_right = 8.39191
+offset_left = 0.160004
+offset_top = 10.0
+offset_right = -5.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Title" type="RichTextLabel" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.077
+offset_left = 14.0
+offset_right = -13.9999
+offset_bottom = 0.103996
+grow_horizontal = 2
+theme_override_colors/font_selected_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/bold_italics_font_size = 32
+theme_override_font_sizes/italics_font_size = 32
+theme_override_font_sizes/mono_font_size = 32
+theme_override_font_sizes/normal_font_size = 32
+theme_override_font_sizes/bold_font_size = 32
+bbcode_enabled = true
+text = "[b]Documentation: [i]Bienvenido[/i][/b]"
+autowrap_mode = 1
+
+[node name="Information" type="RichTextLabel" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.077
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 11.0
+offset_top = 0.103996
+offset_right = -9.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 10
+theme_override_fonts/normal_font = ExtResource("3_h0pa5")
+theme_override_font_sizes/bold_italics_font_size = 20
+theme_override_font_sizes/italics_font_size = 20
+theme_override_font_sizes/mono_font_size = 20
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 20
+bbcode_enabled = true
+horizontal_alignment = 1
 
 [node name="LButtons" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
-anchor_right = 0.114
+anchor_right = 0.158
 anchor_bottom = 1.0
-offset_right = -0.328003
+offset_left = 7.0
+offset_top = 14.0
+offset_right = 6.98399
 grow_vertical = 2
+theme_override_constants/separation = 34
 
-[node name="RButtons" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.886
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 0.327942
-grow_horizontal = 0
-grow_vertical = 2
+[node name="BackBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Volver"
+
+[node name="WelcomeBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Bienvenido"
+
+[node name="InstructionsBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Instrucciones"
+
+[node name="VariablesBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Variables"
+
+[node name="ExpressionsBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Expresiones"
+
+[node name="FunctionBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Funciones"
+
+[node name="ConditionalJumpsBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Saltos 
+Condicionales"
+
+[node name="ControlStatementsBtn" type="Button" parent="LButtons"]
+layout_mode = 2
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(0.796078, 0.796078, 0.796078, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("3_h0pa5")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_00lsx")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_dbils")
+theme_override_styles/normal = SubResource("StyleBoxTexture_a3tmx")
+text = "Estructuras 
+de control"
+
+[connection signal="pressed" from="LButtons/BackBtn" to="." method="_on_back_btn_pressed"]
+[connection signal="pressed" from="LButtons/WelcomeBtn" to="." method="_on_welcome_btn_pressed"]
+[connection signal="pressed" from="LButtons/InstructionsBtn" to="." method="_on_instructions_btn_pressed"]
+[connection signal="pressed" from="LButtons/VariablesBtn" to="." method="_on_variables_btn_pressed"]
+[connection signal="pressed" from="LButtons/ExpressionsBtn" to="." method="_on_expressions_btn_pressed"]
+[connection signal="pressed" from="LButtons/FunctionBtn" to="." method="_on_function_btn_pressed"]
+[connection signal="pressed" from="LButtons/ConditionalJumpsBtn" to="." method="_on_conditional_jumps_btn_pressed"]
+[connection signal="pressed" from="LButtons/ControlStatementsBtn" to="." method="_on_control_statements_btn_pressed"]

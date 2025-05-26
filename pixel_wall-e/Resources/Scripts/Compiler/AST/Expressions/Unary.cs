@@ -2,12 +2,13 @@ public class Unary : Expression
 {
     public Token UnaryOperator { get; private set; }
     public Expression Expression { get; private set;}
-    public Unary(Token unaryOperator, Expression expression)
+    public Unary(Token unaryOperator, Expression expression, ExpressionType type)
     {
         UnaryOperator = unaryOperator;
         Expression = expression;
+        this.type=type;
     }
-    public override object Accept(IExpressionVisitor visitor)
+    public override object Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitUnaryExpression(this);
     }

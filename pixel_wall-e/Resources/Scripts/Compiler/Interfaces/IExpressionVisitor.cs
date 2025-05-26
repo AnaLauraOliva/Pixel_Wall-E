@@ -1,11 +1,11 @@
-public interface IExpressionVisitor
+public interface IExpressionVisitor<T>
 {
-    object visitBinaryExpression(Binary expression);
-    object visitGroupingExpression(Grouping expression);
-    object visitLiteralExpression(Literal expression);
-    object visitUnaryExpression(Unary expression);
-    object visitAssignExpression(Assign expression);
-    object visitCallExpression(Call expression);
-    object visitLogicalExpression(Logical expression);
-    object visitVariableExpression(Variable expression);
+    T visitBinaryExpression(Binary expression);
+    T visitGroupingExpression(Grouping expression);
+    T visitLiteralExpression(Literal expression);
+    T visitUnaryExpression(Unary expression);
+    T visitAssignExpression(Assign expression);
+    T visitCallExpression(Call expression);
+    T visitLogicalExpression(Logical expression);
+    T visitVariableExpression(Variable expression);
 }

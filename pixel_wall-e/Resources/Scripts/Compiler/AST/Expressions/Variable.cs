@@ -1,12 +1,14 @@
 public class Variable : Expression
 {
-    public Variable(Token name)
+    public Variable(Token name, ExpressionType type)
     {
         Name = name;
+        this.type = type;
     }
+    public void defineType(ExpressionType type)=>this.type = type;
     public Token Name { get; }
 
-    public override object Accept(IExpressionVisitor visitor)
+    public override object Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitVariableExpression(this);
     }

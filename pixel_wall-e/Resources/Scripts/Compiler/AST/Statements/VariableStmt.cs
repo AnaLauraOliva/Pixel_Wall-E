@@ -14,7 +14,7 @@ public class VariableStmt : Stmt
 
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitVariableStmt(this);
     }

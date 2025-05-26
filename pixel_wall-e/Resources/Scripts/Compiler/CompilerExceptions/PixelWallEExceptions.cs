@@ -14,6 +14,13 @@ public class CompilerException:Exception
         Column = column;
         InvalidToken = invalidToken;
     }
+    public CompilerException(string kindOfException,string message,Token token):base(message)
+    {
+        KindOfException = kindOfException;
+        Line = token.Line;
+        Column = token.Column;
+        InvalidToken = token.Lexeme;
+    }
     public override string ToString()
     {
         return $"{KindOfException} exception: {Message} (Token: {InvalidToken}) at Line: {Line}, Column: {Column}";

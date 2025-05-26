@@ -1,20 +1,20 @@
-public interface IStatementVisitor
+public interface IStatementVisitor<T>
 {
-    void visitBlockStmt(BlockStmt stmt);
-    void visitExpressionStmt(ExpressionStmt stmt);
-    void visitFunctionStmt(FunctionStmt stmt);
-    void visitIfStmt(IfStmt stmt);
-    void visitReturnStmt(ReturnStmt stmt);
-    void visitGoToStmt(GoToStmt stmt);
-    void visitWhileStmt(WhileStmt stmt);
-    void visitForStmt(ForStmt stmt);
-    void visitSpawnStmt(SpawnStmt stmt);
-    void visitColorStmt(ColorStmt stmt);
-    void visitSizeStmt(SizeStmt stmt);
-    void visitDrawLineStmt(DrawLineStmt stmt);
-    void visitDrawCircleStmt(DrawCircleStmt stmt);
-    void visitDrawRectangleStmt(DrawRectangleStmt stmt);
-    void visitFillStmt(FillStmt stmt);
-    void visitLabelStmt(LabelStmt stmt);
-    void visitVariableStmt(VariableStmt stmt);
+    T visitBlockStmt(BlockStmt stmt);
+    T visitExpressionStmt(ExpressionStmt stmt);
+    T visitFunctionStmt(FunctionStmt stmt);
+    T visitIfStmt(IfStmt stmt);
+    T visitReturnStmt(ReturnStmt stmt);
+    T visitGoToStmt(GoToStmt stmt);
+    T visitWhileStmt(WhileStmt stmt);
+    T visitForStmt(ForStmt stmt);
+    T visitSpawnStmt(SpawnStmt stmt);
+    T visitColorStmt(ColorStmt stmt);
+    T visitSizeStmt(SizeStmt stmt);
+    T visitDrawLineStmt(DrawLineStmt stmt);
+    T visitDrawCircleStmt(DrawCircleStmt stmt);
+    T visitDrawRectangleStmt(DrawRectangleStmt stmt);
+    T visitFillStmt(FillStmt stmt);
+    T visitLabelStmt(LabelStmt stmt);
+    T visitVariableStmt(VariableStmt stmt);
 }

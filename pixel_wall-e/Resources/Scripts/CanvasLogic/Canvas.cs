@@ -10,6 +10,8 @@ public static class Canvas
     //pixels save the position of real canvas pixels
     public static Pixel[,] pixels { get; private set; }
     //Wall-E works with positions on the array of pixels
+    public static Pixel[,] previous { get; private set; }
+    //Infinite cicles do not affect the real canvas
     public static WallE robot { get; private set; } = new WallE();
     public static string brushColor { get; set; } = "Transparent";
     public static int brushSize { get; set; } = 1;
@@ -40,9 +42,9 @@ public static class Canvas
         int minY = Math.Min(y1,y2);
         int maxY = Math.Max(y1,y2);
         int counter = 0;
-        for (int y = y1; y <= y2; y++)
+        for (int y = minY; y <= maxY; y++)
         {
-            for (int x = x1; x <= x2; x++)
+            for (int x = minX; x <= maxY; x++)
             {
                 if (pixels[y,x].Color==color)
                 {
@@ -281,6 +283,19 @@ public static class Canvas
     }
     public static void QuitInstructionsInTheQueue() => commandQueue.Clear();
     public static Queue<DrawCommand> getQueue() => commandQueue;
+    public static void MakePrevious()
+    {
+        //If you do previous = pixels this error correction will not work because if you update pixels, privious will be updated too
+        previous = new Pixel[GetCanvasSize(),GetCanvasSize()];
+        for (int i = 0; i < previous.GetLength(0); i++)
+        {
+            for (int j = 0; j < previous.GetLength(1); j++)
+            {
+                previous[i,j] = new Pixel(pixels[i,j].X0, pixels[i,j].Y0, pixels[i,j].X1, pixels[i,j].Y1, pixels[i,j].Color);
+            }
+        }
+    }
+    public static void BackToPrevious()=>pixels = previous;
 
 }
 public struct DrawCommand

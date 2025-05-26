@@ -3,18 +3,21 @@ using System.Collections.Generic;
 
 public class GoToStmt : Stmt
 {
+    public Token Keyword {get;}
     public Token Label { get; }
     public Expression Condition { get; }
+    public int maxRepetition;
 
 
-    public GoToStmt(Token label, Expression Condition)
+    public GoToStmt(Token label, Expression Condition, Token keyword)
     {
         this.Label = label;
         this.Condition = Condition;
-
+        Keyword = keyword;
+        maxRepetition=10000000;
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitGoToStmt(this);
     }

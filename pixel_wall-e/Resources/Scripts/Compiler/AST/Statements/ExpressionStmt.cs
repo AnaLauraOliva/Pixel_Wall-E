@@ -12,7 +12,7 @@ using System;
 
         }
 
-        public override void Accept(IStatementVisitor visitor)
+        public override void Accept<T>(IStatementVisitor<T> visitor)
         {
             visitor.visitExpressionStmt(this);
         }

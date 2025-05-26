@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class Call : Expression
@@ -7,13 +8,18 @@ public class Call : Expression
         Callee = callee;
         Paren = paren;
         Arguments = arguments;
+        type = ExpressionType.VOID;
+    }
+    public void SetReturnType(ExpressionType type)
+    {
+        this.type = type;
     }
 
     public Expression Callee { get; }
     public Token Paren { get; }
     public List<Expression> Arguments { get; }
 
-    public override object Accept(IExpressionVisitor visitor)
+    public override object Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitCallExpression(this);
     }

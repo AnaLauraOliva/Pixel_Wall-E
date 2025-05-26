@@ -14,7 +14,7 @@ public class ColorStmt : Stmt
         Keyword = keyword;
     }
 
-    public override void Accept(IStatementVisitor visitor)
+    public override void Accept<T>(IStatementVisitor<T> visitor)
     {
         visitor.visitColorStmt(this);
     }
