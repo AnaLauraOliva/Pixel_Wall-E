@@ -6,7 +6,7 @@ public class Grouping : Expression
         this.type=type;
         Expression = expression;
     }
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitGroupingExpression(this);
     }

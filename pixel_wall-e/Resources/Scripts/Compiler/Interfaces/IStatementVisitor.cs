@@ -7,7 +7,6 @@ public interface IStatementVisitor<T>
     T visitReturnStmt(ReturnStmt stmt);
     T visitGoToStmt(GoToStmt stmt);
     T visitWhileStmt(WhileStmt stmt);
-    T visitForStmt(ForStmt stmt);
     T visitSpawnStmt(SpawnStmt stmt);
     T visitColorStmt(ColorStmt stmt);
     T visitSizeStmt(SizeStmt stmt);

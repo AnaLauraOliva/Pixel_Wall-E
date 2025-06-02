@@ -12,7 +12,7 @@ public class Logical : Expression
     public Token Operator { get; }
     public Expression Right { get; }
 
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitLogicalExpression(this);
     }

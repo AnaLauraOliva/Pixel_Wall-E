@@ -16,8 +16,8 @@ public class WhileStmt : Stmt
 
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitWhileStmt(this);
+        return visitor.visitWhileStmt(this);
     }
 }

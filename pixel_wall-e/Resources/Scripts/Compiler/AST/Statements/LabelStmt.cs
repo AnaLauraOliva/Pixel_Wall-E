@@ -12,8 +12,8 @@ using System;
 
         }
 
-        public override void Accept<T>(IStatementVisitor<T> visitor)
+        public override T Accept<T>(IStatementVisitor<T> visitor)
         {
-            visitor.visitLabelStmt(this);
+            return visitor.visitLabelStmt(this);
         }
     }

@@ -5,11 +5,14 @@ public enum TokenType
     //+   -      /      %       √     ,      (           )            [                  ]                   {                 }                  <     >        *   !
 
     //Two Characters tokens
-    ASSIGNMENT, LESS_EQUAL, GREATER_EQUAL, POW, EQUAL_EQUAL, OR, AND, SIMPLE_COMMENT, LEFT_MULTILINE_COMMENT, NOT_EQUAL,
-    //<-        <=          >=             **    ==           ||  &&   //              /*                      !=      
+    ASSIGNMENT, LESS_EQUAL, GREATER_EQUAL, POW, EQUAL_EQUAL, OR, AND, SIMPLE_COMMENT, LEFT_MULTILINE_COMMENT, NOT_EQUAL, TWO_POINTS,
+    //<-        <=          >=             **    ==           ||  &&   //              /*                      !=         :
 
     //Literals
     IDENTIFIER, STRING, INT,
+
+    //Function parameters types
+    NUMBER_TYPE, BOOLEAN_TYPE, VOID_TYPE,
 
     //keywords
     GOTO, WHILE, FOR, IF, ELSE, FUNCTION, RETURN, TRUE, FALSE,

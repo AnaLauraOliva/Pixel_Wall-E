@@ -10,7 +10,7 @@ public class Binary : Expression
         Right = right;
         this.type = type;
     }
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitBinaryExpression(this);
     }

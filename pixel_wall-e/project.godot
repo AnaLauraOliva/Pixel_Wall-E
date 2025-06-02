@@ -21,6 +21,10 @@ config/macos_native_icon="res://Resources/AppIcon/Icon.icns"
 config/windows_native_icon="res://Resources/AppIcon/Icon.ico"
 boot_splash/minimum_display_time=20
 
+[autoload]
+
+MusicManager="*res://Resources/Scripts/MusicManager.cs"
+
 [display]
 
 window/size/mode=3

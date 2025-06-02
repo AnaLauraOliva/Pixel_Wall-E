@@ -27,6 +27,9 @@ class Lexer
         {"DrawCircle", TokenType.DRAWCIRCLE},
         {"DrawRectangle", TokenType.DRAWRECTANGLE},
         {"Fill", TokenType.FILL},
+        {"NUMBER", TokenType.NUMBER_TYPE},
+        {"BOOL", TokenType.BOOLEAN_TYPE},
+        {"VOID", TokenType.VOID_TYPE},
         //{"GetActualX", TokenType.GETACTUALX},
         //{"GetActualY", TokenType.GETACTUALY},
         //{"GetCanvasSize", TokenType.GETCANVASSIZE},
@@ -65,7 +68,8 @@ class Lexer
         {"&&", TokenType.AND},
         {"//", TokenType.SIMPLE_COMMENT},
         {"/*", TokenType.LEFT_MULTILINE_COMMENT},
-        {"!=", TokenType.NOT_EQUAL}
+        {"!=", TokenType.NOT_EQUAL},
+        {":", TokenType.TWO_POINTS}
 
     };
     //get text source

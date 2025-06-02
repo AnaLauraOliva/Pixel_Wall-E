@@ -12,7 +12,8 @@ public static class Canvas
     //Wall-E works with positions on the array of pixels
     public static Pixel[,] previous { get; private set; }
     //Infinite cicles do not affect the real canvas
-    public static WallE robot { get; private set; } = new WallE();
+    public static WallE robot { get; private set; }
+    //WallE x and y is the robot position on the pixels array
     public static string brushColor { get; set; } = "Transparent";
     public static int brushSize { get; set; } = 1;
     private static Queue<DrawCommand> commandQueue = new Queue<DrawCommand>();
@@ -22,6 +23,9 @@ public static class Canvas
     }
     public static void InitializePixel(float cellSize)
     {
+        robot = new WallE();
+        brushColor = "Transparent";
+        brushSize = 1;
         for (int i = 0; i < pixels.GetLength(0); i++)
         {
             for (int j = 0; j < pixels.GetLength(1); j++)
@@ -44,7 +48,7 @@ public static class Canvas
         int counter = 0;
         for (int y = minY; y <= maxY; y++)
         {
-            for (int x = minX; x <= maxY; x++)
+            for (int x = minX; x <= maxX; x++)
             {
                 if (pixels[y,x].Color==color)
                 {

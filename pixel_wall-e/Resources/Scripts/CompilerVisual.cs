@@ -9,7 +9,6 @@ public partial class CompilerVisual : Node
 {
     private CodeEdit _codeEdit;
     private TextEdit _problems;
-    private Handler handler;
     private Popup popup;
     private Button export;
     private Button import;
@@ -21,7 +20,7 @@ public partial class CompilerVisual : Node
     public override void _Ready()
     {
         _codeEdit = GetNode<HBoxContainer>("TextContainer").GetNode<CodeEdit>("CodeEdit");
-        _codeEdit.TextChanged += Compile;
+        //_codeEdit.TextChanged += Compile;
 
         _problems = GetNode<Container>("ProblemsContainer").GetNode<TextEdit>("ProblemsDisplayer");
 
@@ -40,49 +39,11 @@ public partial class CompilerVisual : Node
 
         script = GetNode<CanvasPanelscript>("CanvasPanel");
     }
-    private void Compile()
-    {
-        _problems.Text = "";
-        if (_codeEdit.Text != "")
-        {
-            //handler=new Handler(_codeEdit.Text);
-            Lexer lexer = new Lexer(_codeEdit.Text);
-            List<Token> _tokens = lexer.ScanTokens();
-            List<CompilerException> exceptions = lexer.GetCompilerExceptions();
-            if (exceptions.Count != 0)
-            {
-                PrintExceptions(exceptions);
-                canCompile = false;
-            }
-            else
-            {
-                Parser parser = new Parser(_tokens);
-                statements = parser.parse();
-                exceptions = parser.GetCompilerExceptions();
-                if (exceptions.Count != 0)
-                {
-                    PrintExceptions(exceptions);
-                    canCompile = false;
+    public void FillStatements(List<Stmt>list)=> statements =list;
 
-                }
-                else
-                {
-                    canCompile = true;
-                    SemanticAnalyzer semantic = new SemanticAnalyzer(statements);
-                    semantic.Analyze();
-                    exceptions = semantic.exceptions;
-                    if (exceptions.Count != 0)
-                    {
-                        canCompile = false;
-                        PrintExceptions(exceptions);
-                    }
-                }
-            }
-        }
-    }
-
-    private void PrintExceptions(List<CompilerException> exceptions)
+    public void PrintExceptions(List<CompilerException> exceptions)
     {
+        _problems.Text="";
         foreach (CompilerException exception in exceptions)
         {
             _problems.Text += exception.ToString() + "\n";
@@ -123,18 +84,6 @@ public partial class CompilerVisual : Node
         }
         Canvas.QuitInstructionsInTheQueue();
     }
-    private string PrintAST(Expression expression)
-    {
-        if (expression is Binary binary)
-        {
-            return $"({PrintAST(binary.Left)} {binary.Operator.Lexeme} {PrintAST(binary.Right)})";
-        }
-        if (expression is Literal literal)
-        {
-            return literal.Value.ToString();
-        }
-        return "?";
-    }
     private void Export(string filePath)
     {
         if (!filePath.EndsWith(".pw")) filePath += ".pw";
@@ -164,7 +113,7 @@ public partial class CompilerVisual : Node
             string codeContent = File.ReadAllText(filePath);
             popup.GetNode<Label>("Text").Text = "Archivo importado correctamente desde " + filePath;
             _codeEdit.Text = codeContent;
-            Compile();
+            //Compile();
         }
         catch (System.Exception e)
         {

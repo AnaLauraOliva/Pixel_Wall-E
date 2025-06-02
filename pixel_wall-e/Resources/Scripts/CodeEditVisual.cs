@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 public partial class CodeEditVisual : CodeEdit
 {
     CodeHighlighter highlighter = new CodeHighlighter();
@@ -8,6 +9,7 @@ public partial class CodeEditVisual : CodeEdit
     private RichTextLabel richLabel;
     private ScrollContainer scroll;
     private MarginContainer margin;
+    private List<Stmt> statements = new List<Stmt>();
 
     #region AutoComplete Dictionaries
     private Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)> _colorsData = new()
@@ -23,6 +25,7 @@ public partial class CodeEditVisual : CodeEdit
         ["Transparent"] = (new Color("#AE81FF"), "[b]\"Transparent\"[/b]\nColor transparente predefinido", "\"Transparent\"", CodeCompletionKind.Constant)
     };
     private Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)> _varData = new Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)>();
+    private Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)> _lblData = new Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)>();
     private Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)> _completionData;
     #endregion
     public override void _Ready()
@@ -30,30 +33,35 @@ public partial class CodeEditVisual : CodeEdit
         ConfigureSyntaxHighlighting();
         ConfigureEditorSettings();
         CaretChanged += OnRequestCodeCompletion;
+        TextChanged+=Compile;
+    }
+    public void AddLabelData(string token)
+    {
+        _lblData[token] = (new Color("#AE81FF"), "Local label", token, CodeCompletionKind.Variable);
     }
     public void AddVariableData(string token)
     {
-        _varData[token] = (new Color("#AE81FF"), "Variable", token, CodeCompletionKind.Variable);
+        _varData[token] = (new Color("#AE81FF"), "Local variable", token, CodeCompletionKind.Variable);
 
     }
-    public void AddFunctionData(string token, List<string> arguments)
+    public void AddFunctionData(string token, List<Token> arguments)
     {
         string args = "(";
         for (int i = 0; i < arguments.Count; i++)
         {
             if (i == arguments.Count - 1)
             {
-                args += arguments[i];
+                args += arguments[i].Lexeme;
             }
             else
             {
-                args += $"{arguments[i]},";
+                args += $"{arguments[i].Lexeme},";
             }
         }
         args += ")";
         if (!_completionData.ContainsKey(token))
         {
-            _completionData[token] = (new Color("#66D9EF"), $"[b]{token}[/b]{args}", token, CodeCompletionKind.Function);
+            _completionData[token] = (new Color("#66D9EF"), $"[b]{token}[/b]{args} \n Local function", token+args, CodeCompletionKind.Function);
             highlighter.AddKeywordColor(token, new Color("#66D9EF"));
             return;
         }
@@ -108,6 +116,17 @@ public partial class CodeEditVisual : CodeEdit
             ["true"] = (new Color("#AE81FF"), "[b]true[/b]\nValor booleano verdadero", "true", CodeCompletionKind.Constant),
             ["false"] = (new Color("#AE81FF"), "[b]false[/b]\nValor booleano falso", "false", CodeCompletionKind.Constant),
         };
+        _varData.Clear();
+        _lblData.Clear();
+        foreach (Stmt item in statements)
+        {
+            if(item is FunctionStmt function)
+            {
+                AddFunctionData(function.Name.Lexeme, function.Parameters);
+            }
+            else if(item is VariableStmt variable) AddVariableData(variable.Name.Lexeme);
+            else if (item is LabelStmt lbl) AddLabelData(lbl.Name.Lexeme);
+        }
     }
     private void OnRequestCodeCompletion()
     {
@@ -121,7 +140,7 @@ public partial class CodeEditVisual : CodeEdit
 
         foreach (var entry in _colorsData)
         {
-            if (entry.Key.StartsWith(currentWord))
+            if (entry.Key.StartsWith(currentWord)&&currentWord.Length>0&&currentWord[0]=='"')
             {
                 metadata.Add(entry.Key);
                 AddCodeCompletionOption(entry.Value.kind, entry.Key, entry.Value.autocomplete, entry.Value.color);
@@ -138,13 +157,35 @@ public partial class CodeEditVisual : CodeEdit
                     AddCodeCompletionOption(entry.Value.kind, entry.Key, entry.Value.autocomplete, entry.Value.color);
                 }
             }
+            foreach (var entry in _varData)
+            {
+                if (entry.Key.StartsWith(currentWord))
+                {
+                    metadata.Add(entry.Key);
+                    AddCodeCompletionOption(entry.Value.kind, entry.Key, entry.Value.autocomplete, entry.Value.color);
+                }
+            }
+            foreach (var entry in _lblData)
+            {
+                if (entry.Key.StartsWith(currentWord))
+                {
+                    metadata.Add(entry.Key);
+                    AddCodeCompletionOption(entry.Value.kind, entry.Key, entry.Value.autocomplete, entry.Value.color);
+                }
+            }
         }
         UpdateCodeCompletionOptions(false);
-        if (GetCodeCompletionSelectedIndex() < metadata.Count && GetCodeCompletionSelectedIndex() >= 0)
+        if(metadata.Contains(currentWord))
+        {
+            _MakeCustomTooltip(metadata[metadata.IndexOf(currentWord)]);
+            TooltipText = metadata[metadata.IndexOf(currentWord)].ToString();
+        }
+        else if (GetCodeCompletionSelectedIndex() < metadata.Count && GetCodeCompletionSelectedIndex() >= 0)
         {
             //MakeCustomTooltip makes the tooltip format
             _MakeCustomTooltip(metadata[GetCodeCompletionSelectedIndex()]);
             TooltipText = metadata[GetCodeCompletionSelectedIndex()].ToString();
+            GD.Print("Entra aqui");
         }
         else
         {
@@ -160,13 +201,13 @@ public partial class CodeEditVisual : CodeEdit
         if (column > lineText.Length) column = lineText.Length;
 
         int start = column - 1;
-        while (start >= 0 && char.IsLetterOrDigit(lineText[start]))
+        while (start >= 0 && Regex.IsMatch(lineText[start].ToString(), @"^[a-zA-Z0-9""]"))
         {
             start--;
         }
         start++;
         int end = column;
-        while (end < lineText.Length && char.IsLetterOrDigit(lineText[end]))
+        while (end < lineText.Length && Regex.IsMatch(lineText[end].ToString(),@"^[a-zA-Z0-9]"))
         {
             end++;
         }
@@ -176,7 +217,7 @@ public partial class CodeEditVisual : CodeEdit
     {
         SyntaxHighlighter = highlighter;
         //string[] keywords = ["Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill"];
-        string[] control = ["GoTo", "while", "for", "if", "else", "func", "return"];
+        string[] control = ["GoTo", "while", "for", "if", "else", "func", "return", "NUMBER", "BOOL", "VOID"];
         //string[] functions = ["GetActualY", "GetCanvasSize", "GetColorCount", "IsBrushColor", "IsBrushSize", "IsCanvasColor", "GetActualX"];
         highlighter.AddKeywordColor("true", new Color("#F92672"));
         highlighter.AddKeywordColor("false", new Color("#F92672"));
@@ -222,7 +263,7 @@ public partial class CodeEditVisual : CodeEdit
     private void InitializeTooltipComponents()
     {
         tooltip = new PanelContainer();
-        tooltip.CustomMinimumSize = new Vector2(300, 150);
+        tooltip.CustomMinimumSize = new Vector2(500, 250);
 
         var style = new StyleBoxFlat
         {
@@ -260,14 +301,29 @@ public partial class CodeEditVisual : CodeEdit
     {
         if (IsInstanceValid(richLabel) && IsInstanceValid(tooltip))
         {
-            float width = 200;
+            float width = 500;
             float height = richLabel.GetContentHeight() + 30;
             tooltip.CustomMinimumSize = new Vector2(width, height);
         }
     }
     private string GetTooltipText(string key)
     {
-        if(_completionData is null) return $"[i] No hay información para '{key}'[/i]";
-        return _completionData.TryGetValue(key, out (Color color, string tooltip, string autocomplete, CodeCompletionKind kind) value) ? value.tooltip : _colorsData.TryGetValue(key, out value) ? value.tooltip : $"[i] No hay información para '{key}'[/i]";
+        string complete = _completionData is null ?$"[i] No hay información para '{key}'[/i]":"";
+        if(_varData is not null && _varData.ContainsKey(key)) complete = _varData[key].tooltip + "\n";
+        if(_lblData is not null && _lblData.ContainsKey(key)) complete += _lblData[key].tooltip + "\n";
+        if(_completionData is null) return complete;
+        return _completionData.TryGetValue(key, out (Color color, string tooltip, string autocomplete, CodeCompletionKind kind) value) ? complete+=value.tooltip : _colorsData.TryGetValue(key, out value) ? complete+value.tooltip : $"[i] No hay información para '{key}'[/i]";
+    }
+    private void Compile()
+    {
+        Handler handler = new Handler(this.Text);
+        handler.Handle();
+        List<CompilerException> exception = handler.GetExceptions();
+        HBoxContainer container = GetParent<HBoxContainer>();
+        CompilerVisual visual = container.GetParent<CompilerVisual>();
+        visual.PrintExceptions(exception);
+        statements =handler.GetStmts();
+        visual.FillStatements(statements);
+
     }
 }

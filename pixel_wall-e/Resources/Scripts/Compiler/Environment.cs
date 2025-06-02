@@ -28,14 +28,15 @@ public class Environment
     }
     public void Assign(Token name, object value)
     {
-        if(Enclosing!= null)
-        {
-            Enclosing.Assign(name,value);
-            return;
-        }
+        
         if(values.ContainsKey(name.Lexeme))
         {
             values[name.Lexeme] = value;
+            return;
+        }
+        if(Enclosing!= null)
+        {
+            Enclosing.Assign(name,value);
             return;
         }
         throw new RunTimeError(name, "Undefined variable");
@@ -43,9 +44,9 @@ public class Environment
     }
     public object Get(Token name)
     {
-        if(Enclosing!= null) return Enclosing.Get(name);
         if(values.TryGetValue(name.Lexeme, out object value)) 
         return value;
+        if(Enclosing!= null) return Enclosing.Get(name);
         throw new RunTimeError(name, $"Undefined variable '{name.Lexeme}'." );
     }
     public object GetFunc(Token name)

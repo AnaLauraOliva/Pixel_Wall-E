@@ -14,8 +14,8 @@ public class ReturnStmt : Stmt
 
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitReturnStmt(this);
+        return visitor.visitReturnStmt(this);
     }
 }

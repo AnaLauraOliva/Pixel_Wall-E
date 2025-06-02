@@ -1,4 +1,4 @@
 public abstract class Stmt
 {
-    public abstract void Accept<T>(IStatementVisitor<T> visitor);
+    public abstract T Accept<T>(IStatementVisitor<T> visitor);
 }

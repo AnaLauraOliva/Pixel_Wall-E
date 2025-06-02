@@ -10,7 +10,7 @@ public class Assign:Expression
     public Token Name { get; }
     public Expression Value { get; }
 
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitAssignExpression(this);
     }

@@ -3,14 +3,33 @@ using System.Collections.Generic;
 
 public class PixellWallEFunctions : IPixelWallECallable
 {
+    public PixellWallEFunctions(FunctionStmt declaration)
+    {
+        Declaration = declaration;
+    }
+
+    private FunctionStmt Declaration { get; }
     public int Arity()
     {
-        throw new System.NotImplementedException();
+        return Declaration.Parameters.Count;
     }
 
     public object Call(Interpreter interpreter, List<object> args)
     {
-        throw new System.NotImplementedException();
+        Environment environment = new Environment(interpreter.globals);
+        for (int i = 0; i < Declaration.Parameters.Count; i++)
+        {
+            environment.define(Declaration.Parameters[i].Lexeme, args[i]);
+        }
+        try
+        {
+            interpreter.executeBlock(Declaration.Body, environment);
+        }
+        catch (Return returnValue)
+        {
+            return returnValue.value;
+        }
+        return null;
     }
 }
 public class NativeFunctions : IPixelWallECallable

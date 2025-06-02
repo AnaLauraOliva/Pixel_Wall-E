@@ -16,8 +16,8 @@ public class SpawnStmt : Stmt
         this.keyword = keyword;
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitSpawnStmt(this);
+        return visitor.visitSpawnStmt(this);
     }
 }

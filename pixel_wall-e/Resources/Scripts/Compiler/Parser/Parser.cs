@@ -6,12 +6,12 @@ public class Parser
 {
     private readonly List<Token> _tokens;
     private List<CompilerException> exceptions;
-    public Dictionary<string,ExpressionType> vars;
+    public Dictionary<string, ExpressionType> vars;
     private int _current = 0;
     private int spawnCount = 0;
     public Parser(List<Token> tokens)
     {
-        vars=new Dictionary<string, ExpressionType>();
+        vars = new Dictionary<string, ExpressionType>();
         _tokens = tokens;
         exceptions = new List<CompilerException>();
     }
@@ -71,7 +71,9 @@ public class Parser
         List<Stmt> statements = new List<Stmt>();
         while (!IsAtEnd())
         {
-            statements.Add(declaration());
+            Stmt stmt = declaration();
+            if (stmt != null)
+                statements.Add(stmt);
         }
         return statements;
     }
@@ -89,10 +91,11 @@ public class Parser
             {
                 throw new CompilerException("Syntactical", "You have to beggin your code spawning Wall-E", peek());
             }
+            if (match(TokenType.FUNCTION)) return function("function");
             if (match(TokenType.IDENTIFIER))
             {
-                if((check(TokenType.EOL)||check(TokenType.EOF)||!vars.ContainsKey(previous().Lexeme))&&!check(TokenType.LEFT_PAREN))
-                return VarDeclaration();
+                if ((check(TokenType.EOL) || check(TokenType.EOF) || !vars.ContainsKey(previous().Lexeme)) && !check(TokenType.LEFT_PAREN))
+                    return VarDeclaration();
                 else GoPrevious();
             }
             return Statement();
@@ -103,6 +106,58 @@ public class Parser
             synchronize();
             return null;
         }
+    }
+    private Stmt function(string kind)
+    {
+        ExpressionType type;
+        switch (peek().Type)
+        {
+            case TokenType.NUMBER_TYPE:
+                type = ExpressionType.INT;
+                break;
+            case TokenType.BOOLEAN_TYPE:
+                type = ExpressionType.BOOL;
+                break;
+            case TokenType.VOID_TYPE:
+                type = ExpressionType.VOID;
+                break;
+            default:
+                throw error(peek(), "Expected return type after 'func'");
+        }
+        Advance();
+        consume(TokenType.IDENTIFIER, $"Expected {kind} name.");
+        Token name = previous();
+        consume(TokenType.LEFT_PAREN, $"Expected '(' after {kind} name.");
+        List<Token> parameters = new List<Token>();
+        List<ExpressionType> parametersTypes = new List<ExpressionType>();
+        if (!check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (parameters.Count >= 255) throw error(peek(), "Can't have more than 255 parameters.");
+                consume(TokenType.IDENTIFIER, "Expected parameter name.");
+                parameters.Add(previous());
+                consume(TokenType.TWO_POINTS, "Expected ':' after parameter name");
+                switch (peek().Type)
+                {
+                    case TokenType.NUMBER_TYPE:
+                        parametersTypes.Add(ExpressionType.INT);
+                        break;
+                    case TokenType.BOOLEAN_TYPE:
+                        parametersTypes.Add(ExpressionType.BOOL);
+                        break;
+                    default:
+                        throw error(peek(), "Expected type after ':'");
+                }
+                Advance();
+            } while (match(TokenType.COMMA));
+        }
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+        ConsumeEOL();
+        consume(TokenType.LEFT_CURLY_BRACE, $"Expected '{{' before {kind} body.");
+        List<Stmt> body = block();
+        return new FunctionStmt(name, parameters, body, parametersTypes, type);
+
     }
     private Stmt VarDeclaration(bool isFor = false)
     {
@@ -135,18 +190,31 @@ public class Parser
         if (match(TokenType.LEFT_CURLY_BRACE)) return new BlockStmt(block());
         if (match(TokenType.IF)) return ifStatement();
         if (match(TokenType.WHILE)) return whileStatement();
+        if (match(TokenType.RETURN)) return returnStatement();
         if (match(TokenType.GOTO)) return GoToStatement();
         if (match(TokenType.FOR)) return ForStatement();
         if (match(TokenType.ELSE)) throw new CompilerException("Syntactical", "Else cannot start a statement", previous());
         return ExpressionStatement();
+    }
+    private Stmt returnStatement()
+    {
+        Token keyword = previous();
+        Expression value = null;
+        if (!check(TokenType.EOL))
+        {
+            value = expression();
+        }
+        consume(TokenType.EOL, @"Expected line break ('\n') at end of variable declaration");
+        return new ReturnStmt(keyword, value);
+
     }
     private Stmt ExpressionStatement()
     {
         Expression expr = expression();
         if (peek().Type != TokenType.EOF)
             consume(TokenType.EOL, @"Expected line break ('\n') at end of statement");
-        if(expr is Assign) return new ExpressionStmt(expr);
-        if(expr is Call) return new ExpressionStmt(expr);
+        if (expr is Assign) return new ExpressionStmt(expr);
+        if (expr is Call) return new ExpressionStmt(expr);
         throw new CompilerException("Syntactical", "Unknown statement", peek());
     }
     private Stmt ForStatement()
@@ -229,7 +297,7 @@ public class Parser
         List<Stmt> statements = new List<Stmt>();
         while (!check(TokenType.RIGHT_CURLY_BRACE) && !IsAtEnd())
         {
-            while (match(TokenType.EOL)) { }
+            ConsumeEOL();
             if (check(TokenType.RIGHT_CURLY_BRACE)) break;
             statements.Add(declaration());
         }
@@ -429,7 +497,7 @@ public class Parser
         {
             Token @operator = previous();
             Expression right = powRoot();
-            expression = new Binary(expression, @operator, right,ExpressionType.INT);
+            expression = new Binary(expression, @operator, right, ExpressionType.INT);
         }
         return expression;
     }
@@ -439,7 +507,7 @@ public class Parser
         {
             Token @operator = previous();
             Expression right = unary();
-            return new Unary(@operator, right, @operator.Type==TokenType.NOT?ExpressionType.BOOL:ExpressionType.INT);
+            return new Unary(@operator, right, @operator.Type == TokenType.NOT ? ExpressionType.BOOL : ExpressionType.INT);
         }
         return call();
     }
@@ -460,7 +528,7 @@ public class Parser
             do
             {
                 //I will use Java max arguments support because C# max support is insane
-                if (arguments.Count >= 255) exceptions.Add( error(peek(), "Can't have more than 255 arguments."));
+                if (arguments.Count >= 255) exceptions.Add(error(peek(), "Can't have more than 255 arguments."));
                 arguments.Add(expression());
             } while (match(TokenType.COMMA));
         }
@@ -473,8 +541,8 @@ public class Parser
         if (match(TokenType.FALSE)) return new Literal(false, ExpressionType.BOOL);
         if (match(TokenType.TRUE)) return new Literal(true, ExpressionType.BOOL);
         if (match(TokenType.INT))
-        { 
-            if((double)previous().Literal<int.MinValue||(double)previous().Literal>int.MaxValue)throw error(previous(),"This number is out of range");
+        {
+            if ((double)previous().Literal < int.MinValue || (double)previous().Literal > int.MaxValue) throw error(previous(), "This number is out of range");
             return new Literal(Convert.ToInt32((double)previous().Literal), ExpressionType.INT);
         }
         if (match(TokenType.STRING))
@@ -485,35 +553,35 @@ public class Parser
                 switch (x.Literal.ToString())
                 {
                     case "Red":
-                        return new Literal("#FF0000",ExpressionType.STRING);
+                        return new Literal("#FF0000", ExpressionType.STRING);
 
                     case "Blue":
-                        return new Literal("#0000FF",ExpressionType.STRING);
+                        return new Literal("#0000FF", ExpressionType.STRING);
 
                     case "Green":
-                        return new Literal("#00FF00",ExpressionType.STRING);
+                        return new Literal("#00FF00", ExpressionType.STRING);
 
                     case "Yellow":
-                        return new Literal("#FFFF00",ExpressionType.STRING);
+                        return new Literal("#FFFF00", ExpressionType.STRING);
 
                     case "Orange":
-                        return new Literal("#FFA500",ExpressionType.STRING);
+                        return new Literal("#FFA500", ExpressionType.STRING);
 
                     case "Purple":
-                        return new Literal("#800080",ExpressionType.STRING);
+                        return new Literal("#800080", ExpressionType.STRING);
 
                     case "Black":
-                        return new Literal("#000000",ExpressionType.STRING);
+                        return new Literal("#000000", ExpressionType.STRING);
 
                     case "White":
-                        return new Literal("#FFFFFF",ExpressionType.STRING);
+                        return new Literal("#FFFFFF", ExpressionType.STRING);
 
                     case "Transparent":
-                        return new Literal("Transparent",ExpressionType.STRING);
+                        return new Literal("Transparent", ExpressionType.STRING);
 
                     default:
                         if (IsValidColor(x.Literal.ToString()))
-                            return new Literal(x.Literal.ToString(),ExpressionType.STRING);
+                            return new Literal(x.Literal.ToString(), ExpressionType.STRING);
                         else
                         {
                             throw error(x, "Invalid Color or hex code");
@@ -525,8 +593,8 @@ public class Parser
         if (match(TokenType.IDENTIFIER))
         {
             Token name = previous();
-            ExpressionType type = vars.ContainsKey(name.Lexeme)?vars[name.Lexeme]:ExpressionType.VOID;
-            return new Variable(name,type);
+            ExpressionType type = vars.ContainsKey(name.Lexeme) ? vars[name.Lexeme] : ExpressionType.VOID;
+            return new Variable(name, type);
         }
         if (match(TokenType.LEFT_PAREN))
         {
@@ -590,7 +658,7 @@ public class Parser
     private bool IsAtEnd() => peek().Type == TokenType.EOF;
     private Token peek() => _tokens[_current];
     private Token previous() => _tokens[_current - 1];
-    private void GoPrevious()=>_current--;
+    private void GoPrevious() => _current--;
     private CompilerException error(Token token, string message)
     {
         return new CompilerException("Syntactical", message, token.Line, token.Column, token.Lexeme);

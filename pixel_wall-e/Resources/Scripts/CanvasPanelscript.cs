@@ -14,7 +14,7 @@ public partial class CanvasPanelscript : Panel
     private TextureRect _bigTextureRect;
     private ImageTexture _bigImageTexture;
     private Image _bigImage;
-    private int _gridSize = 32;
+    private int _gridCount = 32;
     private readonly Color _gridColor = new Color("#cccccc");
     private int _maxCanvasSize = 512;
     private ImageTexture _gridTexture;
@@ -50,7 +50,7 @@ public partial class CanvasPanelscript : Panel
         _drawTimer = new Timer();
         AddChild(_drawTimer);
         _drawTimer.Timeout += ProcessNextCommand;
-        _drawTimer.WaitTime = 60.0f / (_gridSize * _gridSize);
+        _drawTimer.WaitTime = 0.3f;
 
         //Adding events
         _applyBtn.Pressed += OnApplyPressed;
@@ -77,17 +77,14 @@ public partial class CanvasPanelscript : Panel
         if (int.TryParse(_sizeInput.Text, out int newSize) &&
         newSize > 0)
         {
-            if (13 * newSize > 512 || 13 * newSize <= 512)
-            {
-                _maxCanvasSize = (13 * newSize > 512) ? 13 * newSize : 512;
-                _canvasImage = Image.CreateEmpty(_maxCanvasSize, _maxCanvasSize, false, Image.Format.Rgba8);
-                _bigImage = Image.CreateEmpty(_maxCanvasSize, _maxCanvasSize, false, Image.Format.Rgba8);
-                _gridTextureRect.CustomMinimumSize = new Vector2(_maxCanvasSize, _maxCanvasSize);
-                _xAxisContainer.CustomMinimumSize = new Vector2(_maxCanvasSize, _xAxisContainer.Size.Y);
-                _yAxisContainer.CustomMinimumSize = new Vector2(_yAxisContainer.Size.X, _maxCanvasSize);
-            }
-            _gridSize = newSize;
-            _drawTimer.WaitTime = 60.0f / (_gridSize * _gridSize);
+            _maxCanvasSize = (13 * newSize > 512) ? 13 * newSize : 512;
+            _canvasImage = Image.CreateEmpty(_maxCanvasSize, _maxCanvasSize, false, Image.Format.Rgba8);
+            _bigImage = Image.CreateEmpty(_maxCanvasSize, _maxCanvasSize, false, Image.Format.Rgba8);
+            _gridTextureRect.CustomMinimumSize = new Vector2(_maxCanvasSize, _maxCanvasSize);
+            _xAxisContainer.CustomMinimumSize = new Vector2(_maxCanvasSize, _xAxisContainer.Size.Y);
+            _yAxisContainer.CustomMinimumSize = new Vector2(_yAxisContainer.Size.X, _maxCanvasSize);
+            _gridCount = newSize;
+            _drawTimer.WaitTime = (13 * newSize > 512)?(0.1f*1.5f)/Math.Sqrt(_gridCount):0.1f;
             GenerateGridTexture();
             UpdateAxisLabels();
         }
@@ -111,12 +108,12 @@ public partial class CanvasPanelscript : Panel
     }
     private void GenerateGridTexture()
     {
-        Canvas.ChangeCanvas(_gridSize);
+        Canvas.ChangeCanvas(_gridCount);
         //White Background
         _canvasImage.Fill(Colors.White);
         _bigImage.Fill(Colors.White);
         //Getting grid size
-        float spacing = _maxCanvasSize / (float)_gridSize;
+        float spacing = _maxCanvasSize / (float)_gridCount;
         Canvas.InitializePixel(spacing);
         Grid(spacing);
         //Release native resources. It's a recommended practice in Godot according with the documentation
@@ -132,7 +129,7 @@ public partial class CanvasPanelscript : Panel
     private void Grid(float spacing)
     {
         //Putting lines
-        for (int i = 0; i < _gridSize; i++)
+        for (int i = 0; i < _gridCount; i++)
         {
             int pos = (int)(i * spacing);
             for (int x = 0; x < _maxCanvasSize; x++)
@@ -154,11 +151,11 @@ public partial class CanvasPanelscript : Panel
             child.QueueFree();
         }
         //Getting grid sizes
-        float cellSize = _maxCanvasSize / (float)_gridSize;
+        float cellSize = _maxCanvasSize / (float)_gridCount;
         //Creating axes
 
-        int dig = _gridSize.ToString().Length;
-        for (int x = 0; x < _gridSize; x++)
+        int dig = _gridCount.ToString().Length;
+        for (int x = 0; x < _gridCount; x++)
         {
             Label label = new Label();
             label.Text = x.ToString();
@@ -173,7 +170,7 @@ public partial class CanvasPanelscript : Panel
             label.AddThemeColorOverride("font_color", new Color(Colors.Black));
             _xAxisContainer.AddChild(label);
         }
-        for (int y = 0; y < _gridSize; y++)
+        for (int y = 0; y < _gridCount; y++)
         {
             Label label = new Label();
             label.Text = y.ToString();
@@ -195,7 +192,7 @@ public partial class CanvasPanelscript : Panel
     {
         if (e is InputEventMouseButton mouse && mouse.ButtonIndex == MouseButton.Left && mouse.Pressed)
         {
-            if (isHide)
+            if (isHide&&!_isAnimated)
             {
                 _bigTextureRect.Visible = true;
                 _bigTextureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
@@ -227,7 +224,7 @@ public partial class CanvasPanelscript : Panel
         {
             _drawTimer.Stop();
             UpdateFullCanvas();
-            //Grid(_maxCanvasSize / (float)_gridSize);
+            //Grid(_maxCanvasSize / (float)_gridCount);
             UpdateTexture();
             _isAnimated = false;
             return;
@@ -272,13 +269,13 @@ public partial class CanvasPanelscript : Panel
             }
         }
     }
-    private void centerOnWallE()
+    private void centerOnWallE(int x, int y)
     {
-        Vector2 vportSize = _canvasScroll.GetViewportRect().Size;
-        Vector2 centerVport = vportSize / 2;
-        Vector2 desiredPosition = wallePos - centerVport;
-        _canvasScroll.ScrollHorizontal = (int)Math.Clamp(desiredPosition.X, 0, _gridTextureRect.Size.X);
-        _canvasScroll.ScrollVertical = (int)Math.Clamp(desiredPosition.Y, 0, _gridTextureRect.Size.Y);
+        float cellSize = _maxCanvasSize / (float)_gridCount;
+        int CenterX = (int)(x * cellSize);
+        int CenterY = (int)(y * cellSize);
+        _canvasScroll.ScrollHorizontal = (int)Math.Clamp(Math.Abs(CenterX), 0, _gridTextureRect.Size.X);
+        _canvasScroll.ScrollVertical = (int)Math.Clamp(Math.Abs(CenterY), 0, _gridTextureRect.Size.Y);
     }
     private void DrawPixel(int x, int y, string Color, int brushSize)
     {
@@ -288,8 +285,6 @@ public partial class CanvasPanelscript : Panel
             PaintPixel(x, y, new Godot.Color(Color));
             return;
         }
-        //follow = new Vector2(x, y);
-        //centerOnWallE();
         int half = brushSize / 2;
         for (int dy = -half; dy <= half; dy++)
         {
@@ -306,7 +301,7 @@ public partial class CanvasPanelscript : Panel
     }
     private void DrawWallE(int x, int y, Color color)
     {
-        float cellSize = _maxCanvasSize / (float)_gridSize;
+        float cellSize = _maxCanvasSize / (float)_gridCount;
         int CenterX = (int)(x * cellSize + cellSize / 2);
         int CenterY = (int)(y * cellSize + cellSize / 2);
         for (int dy = -1; dy <= 1; dy++)
@@ -321,16 +316,17 @@ public partial class CanvasPanelscript : Panel
                 }
             }
         }
+        centerOnWallE(x,y);
     }
     private void PaintPixel(int x, int y, Color color)
     {
-        for (int dy = Canvas.pixels[x, y].Y0-1; dy <= Canvas.pixels[x, y].Y1; dy++)
+        for (int dy = Canvas.pixels[x, y].Y0 - 1; dy <= Canvas.pixels[x, y].Y1; dy++)
         {
-            for (int dx = Canvas.pixels[x, y].X0-1; dx <= Canvas.pixels[x, y].X1; dx++)
+            for (int dx = Canvas.pixels[x, y].X0 - 1; dx <= Canvas.pixels[x, y].X1; dx++)
             {
                 if (dx >= 0 && dx < _canvasImage.GetWidth() && dy >= 0 && dy < _canvasImage.GetHeight())
                 {
-                    if(dy != Canvas.pixels[x, y].Y0-1&& dx != Canvas.pixels[x, y].X0-1)_canvasImage.SetPixel(dx, dy, new Godot.Color(color));
+                    if (dy != Canvas.pixels[x, y].Y0 - 1 && dx != Canvas.pixels[x, y].X0 - 1) _canvasImage.SetPixel(dx, dy, new Godot.Color(color));
                     _bigImage.SetPixel(dx, dy, new Color(color));
                 }
             }

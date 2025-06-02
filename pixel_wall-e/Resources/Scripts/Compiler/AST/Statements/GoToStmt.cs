@@ -17,8 +17,8 @@ public class GoToStmt : Stmt
         maxRepetition=10000000;
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitGoToStmt(this);
+        return visitor.visitGoToStmt(this);
     }
 }

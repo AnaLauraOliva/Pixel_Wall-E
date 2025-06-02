@@ -6,7 +6,7 @@ public class Literal : Expression
         Value = value;
         this.type = type;
     }
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitLiteralExpression(this);
     }

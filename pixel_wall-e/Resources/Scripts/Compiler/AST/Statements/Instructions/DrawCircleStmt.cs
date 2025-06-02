@@ -18,8 +18,8 @@ public class DrawCircleStmt : Stmt
         this.keyword = keyword;
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitDrawCircleStmt(this);
+        return visitor.visitDrawCircleStmt(this);
     }
 }

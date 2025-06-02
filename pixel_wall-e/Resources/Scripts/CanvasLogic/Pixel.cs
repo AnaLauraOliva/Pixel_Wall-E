@@ -7,7 +7,7 @@ public class Pixel
         X1 = x1;
         Y1 = y1;
         this.Color = Color;
-        hasWallE = false;
+        //hasWallE = false;
     }
     public int X0 { get; }
     public int Y0 { get; }

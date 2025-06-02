@@ -14,8 +14,8 @@ using System;
         this.keyword = keyword;
     }
 
-        public override void Accept<T>(IStatementVisitor<T> visitor)
+        public override T Accept<T>(IStatementVisitor<T> visitor)
         {
-            visitor.visitSizeStmt(this);
+            return visitor.visitSizeStmt(this);
         }
     }

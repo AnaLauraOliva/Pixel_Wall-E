@@ -8,7 +8,7 @@ public class Variable : Expression
     public void defineType(ExpressionType type)=>this.type = type;
     public Token Name { get; }
 
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitVariableExpression(this);
     }

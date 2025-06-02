@@ -19,7 +19,7 @@ public class Call : Expression
     public Token Paren { get; }
     public List<Expression> Arguments { get; }
 
-    public override object Accept<T>(IExpressionVisitor<T> visitor)
+    public override T Accept<T>(IExpressionVisitor<T> visitor)
     {
         return visitor.visitCallExpression(this);
     }

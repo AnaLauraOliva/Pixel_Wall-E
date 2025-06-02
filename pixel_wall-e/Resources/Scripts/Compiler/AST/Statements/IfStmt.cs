@@ -18,8 +18,8 @@ public class IfStmt : Stmt
 
     }
 
-    public override void Accept<T>(IStatementVisitor<T> visitor)
+    public override T Accept<T>(IStatementVisitor<T> visitor)
     {
-        visitor.visitIfStmt(this);
+        return visitor.visitIfStmt(this);
     }
 }

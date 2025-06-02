@@ -15,10 +15,16 @@ public class Handler
         _tokens = new List<Token>();
         _statements = new List<Stmt>();
         interpreter = new Interpreter();
+        
+    }
+    public void Handle()
+    {
         HandleLexer();
         if(_exceptions.Count==0)
         {
             HandleParser();
+            if(_exceptions.Count==0)
+            HandleSemantic();
         }
     }
     public List<CompilerException> GetExceptions()=>_exceptions;
@@ -34,8 +40,11 @@ public class Handler
         _statements= parser.parse();
         _exceptions = parser.GetCompilerExceptions();
     }
-    public void Interpret()
+    private void HandleSemantic()
     {
-        interpreter.Interpret(_statements);
+        SemanticAnalyzer semantic = new SemanticAnalyzer(_statements);
+        semantic.Analyze();
+        _exceptions = semantic.GetExceptions();
     }
+    public List<Stmt> GetStmts()=>_statements;
 }
