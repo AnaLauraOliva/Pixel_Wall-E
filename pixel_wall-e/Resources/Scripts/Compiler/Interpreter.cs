@@ -27,6 +27,38 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
             return Canvas.GetColorCount(color, x1, y1, x2, y2);
         }
         ));
+        globals.defineNative("ConvertToHex", new NativeFunctions(3, args =>
+        {
+            Dictionary<int, string> HexEquivalence = new Dictionary<int, string>()
+            {
+                [0] = "0",
+                [1] = "1",
+                [2] = "2",
+                [3] = "3",
+                [4] = "4",
+                [5] = "5",
+                [6] = "6",
+                [7] = "7",
+                [8] = "8",
+                [9] = "9",
+                [10] = "A",
+                [11] = "B",
+                [12] = "C",
+                [13] = "D",
+                [14] = "E",
+                [15] = "F"
+            };
+            string hex = "#";
+            foreach (int X in args)
+            {
+                int actual =Math.Clamp(X,0,255);
+                int div = actual/16;
+                int rest = actual%16;
+                hex+=HexEquivalence[div];
+                hex+=HexEquivalence[rest];
+            }
+            return hex;
+        }));
         globals.defineNative("IsBrushColor", new NativeFunctions(1, args =>
         {
             return Canvas.IsBrushColor(args[0] as string);
@@ -37,7 +69,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
         }));
         globals.defineNative("IsCanvasColor", new NativeFunctions(3, args => Canvas.IsCanvasColor(args[0] as string, Convert.ToInt32(args[1]), Convert.ToInt32(args[2]))));
         environment = globals;
-        
+
     }
     public void Interpret(List<Stmt> Statements)
     {
@@ -50,13 +82,13 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
                 {
                     labels.Add(((LabelStmt)Statements[i]).Name.Lexeme, i);
                 }
-                if(Statements[i] is FunctionStmt)
-                execute(Statements[i]);
+                if (Statements[i] is FunctionStmt)
+                    execute(Statements[i]);
             }
             while (current < Statements.Count)
             {
-                if(Statements[current] is not LabelStmt && Statements[current] is not FunctionStmt)
-                execute(Statements[current]);
+                if (Statements[current] is not LabelStmt && Statements[current] is not FunctionStmt)
+                    execute(Statements[current]);
                 current++;
                 callDepth = 0;
             }
@@ -67,7 +99,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
             Canvas.BackToPrevious();
             exceptions.Add(error);
         }
-        catch(Return)
+        catch (Return)
         {
             exceptions.Add(new RunTimeError("You have returned sucessfully"));
         }
@@ -87,7 +119,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
         return ob.ToString();
     }
     #region Expressions
-    public object visitLiteralExpression(Literal expression) => int.TryParse(expression.Value.ToString(), out int value)? value : expression.Value;
+    public object visitLiteralExpression(Literal expression) => int.TryParse(expression.Value.ToString(), out int value) ? value : expression.Value;
     public object visitGroupingExpression(Grouping expression) => Evaluate(expression.Expression);
     private object Evaluate(Expression expression) => expression.Accept(this);
     public object visitUnaryExpression(Unary expression)
@@ -141,7 +173,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
                 return (int)leftBranch + (int)rightBranch;
             case TokenType.SLASH:
                 checkNumberOperands(expression.Operator, leftBranch, rightBranch);
-                if((int)rightBranch ==0) throw new RunTimeError(expression.Operator,"You cannot divide by zero");
+                if ((int)rightBranch == 0) throw new RunTimeError(expression.Operator, "You cannot divide by zero");
                 return (int)leftBranch / (int)rightBranch;
             case TokenType.BY:
                 checkNumberOperands(expression.Operator, leftBranch, rightBranch);
@@ -185,9 +217,9 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
     public object visitCallExpression(Call expression)
     {
         callDepth++;
-        if(callDepth>10000) throw new RunTimeError($"StackOverflow: Deepth recurtion. Calls:{callDepth}");
+        if (callDepth > 100000) throw new RunTimeError($"StackOverflow: Deepth recurtion. Calls:{callDepth}");
         object callee = expression.Callee;
-        if(callee is not Variable) throw new RunTimeError(expression.Paren,"Callee must be an identifier");
+        if (callee is not Variable) throw new RunTimeError(expression.Paren, "Callee must be an identifier");
         callee = environment.GetFunc(((Variable)callee).Name);
         List<object> arguments = new List<object>();
         foreach (Expression arg in expression.Arguments)
@@ -295,7 +327,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
     public object visitReturnStmt(ReturnStmt stmt)
     {
         object value = null;
-        if(stmt.value != null) value = Evaluate(stmt.value);
+        if (stmt.value != null) value = Evaluate(stmt.value);
         throw new Return(value);
     }
 
@@ -303,7 +335,7 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
     {
         int index = labels.GetPosition(stmt.Label);
         stmt.maxRepetition--;
-        if (stmt.maxRepetition<=0) throw new RunTimeError(stmt.Keyword, "Infinit Loop");
+        if (stmt.maxRepetition <= 0) throw new RunTimeError(stmt.Keyword, "Infinit Loop");
         object condition = Evaluate(stmt.Condition);
         if (isTrue(condition))
         {
@@ -343,7 +375,8 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
 
     public object visitColorStmt(ColorStmt stmt)
     {
-        Canvas.ChangeColor(((Literal)stmt.ColorName).Value.ToString());
+        string color = Evaluate(stmt.ColorName).ToString();
+        Canvas.ChangeColor(color);
         return null;
     }
 
@@ -476,10 +509,10 @@ public class RunTimeError : Exception
         return $"RunTime exception: {message} at Line: {token.Line} Column: {token.Column}. (Token {token.Lexeme})";
     }
 }
-public class Return: Exception
+public class Return : Exception
 {
     public readonly object value;
-    public Return(object value):base(null, null)
+    public Return(object value) : base(null, null)
     {
         this.value = value;
     }

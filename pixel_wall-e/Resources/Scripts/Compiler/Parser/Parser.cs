@@ -392,17 +392,6 @@ public class Parser
         return new ColorStmt(expr, key);
 
     }
-    private bool IsValidColor(string color)
-    {
-        if (string.IsNullOrEmpty(color) || color[0].ToString() != "#") return false;
-        string hex = color.Substring(1);
-        if (hex.Length != 6) return false;
-        foreach (char c in hex)
-        {
-            if (!Uri.IsHexDigit(c)) return false;
-        }
-        return true;
-    }
     private Expression expression()
     {
         return assignment();
@@ -545,51 +534,7 @@ public class Parser
             if ((double)previous().Literal < int.MinValue || (double)previous().Literal > int.MaxValue) throw error(previous(), "This number is out of range");
             return new Literal(Convert.ToInt32((double)previous().Literal), ExpressionType.INT);
         }
-        if (match(TokenType.STRING))
-        {
-            Token x = previous();
-            if (exceptions.Count == 0)
-            {
-                switch (x.Literal.ToString())
-                {
-                    case "Red":
-                        return new Literal("#FF0000", ExpressionType.STRING);
-
-                    case "Blue":
-                        return new Literal("#0000FF", ExpressionType.STRING);
-
-                    case "Green":
-                        return new Literal("#00FF00", ExpressionType.STRING);
-
-                    case "Yellow":
-                        return new Literal("#FFFF00", ExpressionType.STRING);
-
-                    case "Orange":
-                        return new Literal("#FFA500", ExpressionType.STRING);
-
-                    case "Purple":
-                        return new Literal("#800080", ExpressionType.STRING);
-
-                    case "Black":
-                        return new Literal("#000000", ExpressionType.STRING);
-
-                    case "White":
-                        return new Literal("#FFFFFF", ExpressionType.STRING);
-
-                    case "Transparent":
-                        return new Literal("Transparent", ExpressionType.STRING);
-
-                    default:
-                        if (IsValidColor(x.Literal.ToString()))
-                            return new Literal(x.Literal.ToString(), ExpressionType.STRING);
-                        else
-                        {
-                            throw error(x, "Invalid Color or hex code");
-                        }
-
-                }
-            }
-        }
+        if (match(TokenType.STRING)) return new Literal(previous().Literal, ExpressionType.STRING, previous());
         if (match(TokenType.IDENTIFIER))
         {
             Token name = previous();

@@ -4,11 +4,21 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
 {
     private List<Stmt> statements;
     private List<CompilerException> exceptions = new List<CompilerException>();
-    private List<string> Vars;
-    private List<string> Funcs;
     private bool canDeclareFunction = true;
     SemanticEnvironment env = new SemanticEnvironment();
     SemanticEnvironment globals = new SemanticEnvironment();
+    private Dictionary<string,string> definedColors = new Dictionary<string, string>()
+    {
+        ["Red"]="#FF0000",
+        ["Blue"]="#0000FF",
+        ["Green"] = "#00FF00",
+        ["Yellow"]="#FFFF00",
+        ["Orange"] ="#FF9B00",
+        ["Purple"] ="#A020F0",
+        ["Black"] = "#000000",
+        ["White"] ="#FFFFFF",
+        ["Transparent"] ="Transparent"
+    };
     public SemanticAnalyzer(List<Stmt> statements)
     {
         globals.defineFunc("GetActualX", ExpressionType.INT, new List<ExpressionType>());
@@ -18,6 +28,7 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
         globals.defineFunc("IsBrushColor", ExpressionType.INT, new List<ExpressionType>() { ExpressionType.STRING });
         globals.defineFunc("IsBrushSize", ExpressionType.INT, new List<ExpressionType>() { ExpressionType.INT });
         globals.defineFunc("IsCanvasColor", ExpressionType.INT, new List<ExpressionType>() { ExpressionType.STRING, ExpressionType.INT, ExpressionType.INT });
+        globals.defineFunc("ConvertToHex", ExpressionType.STRING, new List<ExpressionType>(){ExpressionType.INT, ExpressionType.INT, ExpressionType.INT});
         env = globals;
         this.statements = statements;
     }
@@ -101,6 +112,7 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
     }
     public ReturnStatus visitBlockStmt(BlockStmt stmt)
     {
+        canDeclareFunction=false;
         ReturnStatus status = ReturnStatus.Never;
         ExecuteBlock(stmt.Statements, new SemanticEnvironment(env), ref status);
         return status;
@@ -148,7 +160,7 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
     public ReturnStatus visitColorStmt(ColorStmt stmt)
     {
         stmt.ColorName.Accept(this);
-        if (stmt.ColorName is null || stmt.ColorName is not Literal || ((Literal)stmt.ColorName).Value is not string) throw error("The argument of Color instruction must be a string", stmt.Keyword);
+        if (stmt.ColorName is null || stmt.ColorName.type is not ExpressionType.STRING) throw error("The argument of Color instruction must be a string", stmt.Keyword);
         return ReturnStatus.Never;
     }
 
@@ -323,7 +335,9 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
         canDeclareFunction = false;
         stmt.condition.Accept(this);
         if (stmt.condition.type is not ExpressionType.BOOL) throw error("If condition must be boolean", stmt.keyword);
-        ReturnStatus then = stmt.thenBranch.Accept(this);
+        ReturnStatus then = ReturnStatus.Never;
+        if(stmt.elseBranch is not null)
+        then = stmt.thenBranch.Accept(this);
         ReturnStatus elseBranch = ReturnStatus.Never;
         if (stmt.elseBranch is not null) elseBranch = stmt.elseBranch.Accept(this);
         if (then == ReturnStatus.Always && elseBranch == ReturnStatus.Always) return ReturnStatus.Always;
@@ -338,6 +352,17 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
 
     public ReturnStatus visitLiteralExpression(Literal expression)
     {
+        if(expression.type is ExpressionType.STRING)
+        {
+            if(definedColors.ContainsKey(expression.Value.ToString()))
+            {
+                expression.ChangeValue(definedColors[expression.Value.ToString()]);
+            }
+            else if(!IsValidColor(expression.Value.ToString()))
+            {
+                throw error("Invalid Color or hex code", expression.Keyword);
+            }
+        }
         return ReturnStatus.Never;
     }
 
@@ -393,6 +418,7 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
     public ReturnStatus visitVariableStmt(VariableStmt stmt)
     {
         Evaluate(stmt.initializer);
+        if(stmt.initializer is Call call&& call.type == ExpressionType.VOID) throw error("You cannot assign a void function to a variable", stmt.Name);
         env.defineVar(stmt.Name.Lexeme, stmt.initializer.type);
         return ReturnStatus.Never;
     }
@@ -428,6 +454,17 @@ public class SemanticAnalyzer : IExpressionVisitor<ReturnStatus>, IStatementVisi
 
             this.env = prev;
         }
+    }
+    private bool IsValidColor(string color)
+    {
+        if (string.IsNullOrEmpty(color) || color[0].ToString() != "#") return false;
+        string hex = color.Substring(1);
+        if (hex.Length != 6) return false;
+        foreach (char c in hex)
+        {
+            if (!Uri.IsHexDigit(c)) return false;
+        }
+        return true;
     }
 }
 public enum ReturnStatus

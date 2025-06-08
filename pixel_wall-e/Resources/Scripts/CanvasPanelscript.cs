@@ -50,7 +50,7 @@ public partial class CanvasPanelscript : Panel
         _drawTimer = new Timer();
         AddChild(_drawTimer);
         _drawTimer.Timeout += ProcessNextCommand;
-        _drawTimer.WaitTime = 0.3f;
+        _drawTimer.WaitTime = 0.1f;
 
         //Adding events
         _applyBtn.Pressed += OnApplyPressed;

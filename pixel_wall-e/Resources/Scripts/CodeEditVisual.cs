@@ -33,15 +33,15 @@ public partial class CodeEditVisual : CodeEdit
         ConfigureSyntaxHighlighting();
         ConfigureEditorSettings();
         CaretChanged += OnRequestCodeCompletion;
-        TextChanged+=Compile;
+        TextChanged += Compile;
     }
     public void AddLabelData(string token)
     {
-        _lblData[token] = (new Color("#AE81FF"), "Local label", token, CodeCompletionKind.Variable);
+        _lblData[token] = (new Color("#AE81FF"), "Etiqueta local", token, CodeCompletionKind.Variable);
     }
     public void AddVariableData(string token)
     {
-        _varData[token] = (new Color("#AE81FF"), "Local variable", token, CodeCompletionKind.Variable);
+        _varData[token] = (new Color("#AE81FF"), "Variable local", token, CodeCompletionKind.Variable);
 
     }
     public void AddFunctionData(string token, List<Token> arguments)
@@ -61,8 +61,7 @@ public partial class CodeEditVisual : CodeEdit
         args += ")";
         if (!_completionData.ContainsKey(token))
         {
-            _completionData[token] = (new Color("#66D9EF"), $"[b]{token}[/b]{args} \n Local function", token+args, CodeCompletionKind.Function);
-            highlighter.AddKeywordColor(token, new Color("#66D9EF"));
+            _completionData[token] = (new Color("#66D9EF"), $"[b]{token}[/b]{args} \n Función local", token + args, CodeCompletionKind.Function);
             return;
         }
     }
@@ -70,7 +69,7 @@ public partial class CodeEditVisual : CodeEdit
     {
         _completionData = new Dictionary<string, (Color color, string tooltip, string autocomplete, CodeCompletionKind kind)>()
         {
-            //Instructions
+            //Completion data
             ["Spawn"] = (new Color("#A6E22E"), "[b]Spawn[/b]([color=#F92672]int[/color] x, [color=#F92672]int[/color] y)\n" +
         "Inicializa a Wall-E sobre el canvas. Las entradas x, y representan las coordenadas iniciales.\n\n" +
         "[color=#75715E]Ejemplo: Spawn(0,0)[/color]", "Spawn(x, y)", CodeCompletionKind.Function),
@@ -98,33 +97,39 @@ public partial class CodeEditVisual : CodeEdit
             ["GetActualY"] = (new Color("#66D9EF"), "[b]GetActualY[/b]()\n Retorna el valor Y de la posición actual de Wall-E.", "GetActualY()", CodeCompletionKind.Function),
             ["GetCanvasSize"] = (new Color("#66D9EF"), "[b]GetCanvasSize[/b]()\n Retorna tamaño largo y ancho del canvas. Para un canvas de n x n se retorna n.", "GetCanvasSize()", CodeCompletionKind.Function),
             ["GetColorCount"] = (new Color("#66D9EF"), "[b]GetColorCount[/b]([color=#66D9EF]string[/color] color, [color=#F92672]int[/color] x1, [color=#F92672]int[/color] y1, [color=#F92672]int[/color]x2, [color=#F92672]int[/color]y2)" +
-        "Retorna la cantidad de casillar con color [i]color[/i] que hay en el rectángulo formado por las posiciones [i]x1[/i], [i]y1[/i] y [i]x2[/i], [i]y2[/i]. Si cualquiera de las esquinas cae fuera de las dimensiones del canvas, retorna 0.", "GetColorCount(color, x1, x2, y1, y2)", CodeCompletionKind.Function),
+        "Retorna la cantidad de casillas con color [i]color[/i] que hay en el rectángulo formado por las posiciones [i]x1[/i], [i]y1[/i] y [i]x2[/i], [i]y2[/i]. Si cualquiera de las esquinas cae fuera de las dimensiones del canvas, retorna 0.", "GetColorCount(color, x1, x2, y1, y2)", CodeCompletionKind.Function),
             ["IsBrushColor"] = (new Color("#66D9EF"), "[b]IsBrushColor[/b]([color=#66D9EF]string[/color] color)\n Retorna 1 si el color de la brocha actual es [i]color[/i], 0 en caso contrario.", "IsBrushColor(color)", CodeCompletionKind.Function),
             ["IsBrushSize"] = (new Color("#66D9EF"), "[b]IsBrushSize[/b]([color=#F92672]int[/color] size)\n" +
         "Retorna 1 si el tamaño de la brocha actual es [i]size[/i], 0 en caso contrario", "IsBrushSize(size)", CodeCompletionKind.Function),
             ["IsCanvasColor"] = (new Color("#66D9EF"), "[b]IsBrushColor[/b]([color=#66D9EF]string[/color] color, [color=#F92672]int[/color] vertical, [color=#F92672]int[/color] horizontal)\n" +
         "Retorna 1 si la casilla señalada está pintada del parámetro [i]color[/i], 0 en caso contrario. La casilla en cuestión se determina por la posición actual de Wall-E (X,Y) y se calcula como: (X + horizontal, Y + vertical). Si cae fuera del canvas retorna 0.",
         "IsCanvasColor(color, vertical, horizontal)", CodeCompletionKind.Function),
+            ["ConvertToHex"] = (new Color("#66D9EF"), "[b]ConvertToHex[/b]([color=#F92672]int[/color] R, [color=#F92672]int[/color] G, [color=#F92672]int[/color] B)\n" +
+        "Convierte de RGB a código Hex y devuelve el string correspondiente. Las entradas R, G y B son enteros entre 0 y 255, si se introduce un número menor que 0 la función lo convierte a 0, y si es mayor que 255 lo transforma a 255",
+        "ConvertToHex(R, G, B)", CodeCompletionKind.Function),
             ["if"] = (new Color("#F92672"), "[b]if[/b]([color=#AE81FF]condition[/color])\nEjecuta el bloque si es verdadero\n\n" +
         "[color=#75715E]Ejemplo: if(x<10)[/color]", "if(condition)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
             ["else if"] = (new Color("#F92672"), "[b]else if[/b]([color=#AE81FF]condition[/color])\nCondicional secundario", "else if(condition)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
             ["else"] = (new Color("#F92672"), "[b]else[/b]\nBloque ejecutado si no se cumple if/elif", "else\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
             ["while"] = (new Color("#F92672"), "[b]while[/b]([color=#AE81FF]condition[/color])\nBucle mientras sea verdadero", "while(true)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
-            ["for"] = (new Color("#F92672"), "[b]for[/b]([color=#AE81FF]inicio[/color], [color=#AE81FF]condition[/color], [color=#AE81FF]incremento[/color])\nBucle con contador", "for(i<-0,i<10,i<-i+1)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
+            ["for"] = (new Color("#F92672"), "[b]for[/b]([color=#AE81FF]inicio[/color], [color=#AE81FF]condition[/color], [color=#AE81FF]incremento[/color])\nBucle con contador", "for(i<-0,i<Length,i<-i+1)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
             ["forr"] = (new Color("#F92672"), "[b]for[/b]([color=#AE81FF]inicio[/color], [color=#AE81FF]condition[/color], [color=#AE81FF]incremento[/color])\nBucle con contador", "for(i<-Length,i>=0,i<-i-1)\n{\n//Put your code here\n}", CodeCompletionKind.PlainText),
             ["GoTo"] = (new Color("#F92672"), "[b]GoTo[/b][[color=#AE81FF]Label[/color]]([color=#AE81FF]condition[/color])\nSi la condición es verdadera, el código continúa su ejecución en la línea de la etiqueta correspondiente", "GoTo[Label](x<10)", CodeCompletionKind.PlainText),
             ["true"] = (new Color("#AE81FF"), "[b]true[/b]\nValor booleano verdadero", "true", CodeCompletionKind.Constant),
             ["false"] = (new Color("#AE81FF"), "[b]false[/b]\nValor booleano falso", "false", CodeCompletionKind.Constant),
+            ["NUMBER"] = (new Color("#AE81FF"), "[b]NUMBER[/b]\nEsta variable o función es un entero", "NUMBER", CodeCompletionKind.Constant),
+            ["VOID"] = (new Color("#AE81FF"), "[b]false[/b]\nEl retorno de esta función es vacío", "VOID", CodeCompletionKind.Constant),
+            ["BOOL"] = (new Color("#AE81FF"), "[b]false[/b]\nEsta variable o función es booleana", "BOOL", CodeCompletionKind.Constant)
         };
         _varData.Clear();
         _lblData.Clear();
         foreach (Stmt item in statements)
         {
-            if(item is FunctionStmt function)
+            if (item is FunctionStmt function)
             {
                 AddFunctionData(function.Name.Lexeme, function.Parameters);
             }
-            else if(item is VariableStmt variable) AddVariableData(variable.Name.Lexeme);
+            else if (item is VariableStmt variable) AddVariableData(variable.Name.Lexeme);
             else if (item is LabelStmt lbl) AddLabelData(lbl.Name.Lexeme);
         }
     }
@@ -140,13 +145,13 @@ public partial class CodeEditVisual : CodeEdit
 
         foreach (var entry in _colorsData)
         {
-            if (entry.Key.StartsWith(currentWord)&&currentWord.Length>0&&currentWord[0]=='"')
+            if (currentWord.Length > 0 && entry.Key.StartsWith(currentWord.Substring(1, Math.Clamp(currentWord.Length - 1, 0, currentWord.Length - 1))) && currentWord[0] == '"')
             {
                 metadata.Add(entry.Key);
                 AddCodeCompletionOption(entry.Value.kind, entry.Key, entry.Value.autocomplete, entry.Value.color);
             }
         }
-        if (metadata.Count == 0 || currentWord=="")
+        if (metadata.Count == 0 || currentWord == "")
         {
 
             foreach (var entry in _completionData)
@@ -175,7 +180,7 @@ public partial class CodeEditVisual : CodeEdit
             }
         }
         UpdateCodeCompletionOptions(false);
-        if(metadata.Contains(currentWord))
+        if (metadata.Contains(currentWord))
         {
             _MakeCustomTooltip(metadata[metadata.IndexOf(currentWord)]);
             TooltipText = metadata[metadata.IndexOf(currentWord)].ToString();
@@ -185,7 +190,6 @@ public partial class CodeEditVisual : CodeEdit
             //MakeCustomTooltip makes the tooltip format
             _MakeCustomTooltip(metadata[GetCodeCompletionSelectedIndex()]);
             TooltipText = metadata[GetCodeCompletionSelectedIndex()].ToString();
-            GD.Print("Entra aqui");
         }
         else
         {
@@ -207,7 +211,7 @@ public partial class CodeEditVisual : CodeEdit
         }
         start++;
         int end = column;
-        while (end < lineText.Length && Regex.IsMatch(lineText[end].ToString(),@"^[a-zA-Z0-9]"))
+        while (end < lineText.Length && Regex.IsMatch(lineText[end].ToString(), @"^[a-zA-Z0-9]"))
         {
             end++;
         }
@@ -216,23 +220,13 @@ public partial class CodeEditVisual : CodeEdit
     private void ConfigureSyntaxHighlighting()
     {
         SyntaxHighlighter = highlighter;
-        //string[] keywords = ["Spawn", "Color", "Size", "DrawLine", "DrawCircle", "DrawRectangle", "Fill"];
         string[] control = ["GoTo", "while", "for", "if", "else", "func", "return", "NUMBER", "BOOL", "VOID"];
-        //string[] functions = ["GetActualY", "GetCanvasSize", "GetColorCount", "IsBrushColor", "IsBrushSize", "IsCanvasColor", "GetActualX"];
         highlighter.AddKeywordColor("true", new Color("#F92672"));
         highlighter.AddKeywordColor("false", new Color("#F92672"));
         foreach (var item in control)
         {
             highlighter.AddKeywordColor(item, new Color("#F92672"));
         }
-        /*foreach (var item in keywords)
-        {
-            highlighter.AddKeywordColor(item, new Color("#A6E22E")); #89CFF0
-        }
-        foreach (var item in functions)
-        {
-            highlighter.AddKeywordColor(item, new Color("#66D9EF"));
-        }*/
         highlighter.SymbolColor = new Color("#F92672");
         highlighter.FunctionColor = new Color("#A6E22E");
         highlighter.MemberVariableColor = new Color("#F8F8F2");
@@ -308,11 +302,11 @@ public partial class CodeEditVisual : CodeEdit
     }
     private string GetTooltipText(string key)
     {
-        string complete = _completionData is null ?$"[i] No hay información para '{key}'[/i]":"";
-        if(_varData is not null && _varData.ContainsKey(key)) complete = _varData[key].tooltip + "\n";
-        if(_lblData is not null && _lblData.ContainsKey(key)) complete += _lblData[key].tooltip + "\n";
-        if(_completionData is null) return complete;
-        return _completionData.TryGetValue(key, out (Color color, string tooltip, string autocomplete, CodeCompletionKind kind) value) ? complete+=value.tooltip : _colorsData.TryGetValue(key, out value) ? complete+value.tooltip : $"[i] No hay información para '{key}'[/i]";
+        string complete = _completionData is null ? $"[i] No hay información para '{key}'[/i]" : "";
+        if (_varData is not null && _varData.ContainsKey(key)) complete = _varData[key].tooltip + "\n";
+        if (_lblData is not null && _lblData.ContainsKey(key)) complete += _lblData[key].tooltip + "\n";
+        if (_completionData is null) return complete;
+        return _completionData.TryGetValue(key, out (Color color, string tooltip, string autocomplete, CodeCompletionKind kind) value) ? complete += value.tooltip : _colorsData.TryGetValue(key, out value) ? complete + value.tooltip : $"[i] No hay información para '{key}'[/i]";
     }
     private void Compile()
     {
@@ -322,7 +316,7 @@ public partial class CodeEditVisual : CodeEdit
         HBoxContainer container = GetParent<HBoxContainer>();
         CompilerVisual visual = container.GetParent<CompilerVisual>();
         visual.PrintExceptions(exception);
-        statements =handler.GetStmts();
+        statements = handler.GetStmts();
         visual.FillStatements(statements);
 
     }

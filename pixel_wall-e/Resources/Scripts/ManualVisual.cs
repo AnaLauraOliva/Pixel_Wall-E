@@ -7,7 +7,7 @@ public partial class ManualVisual : Control
     Dictionary<string, (string text, string title)> _displayText = new Dictionary<string, (string, string)>
     {
         ["Welcome"] = (
-@"[center][font_size=28][b]🛠️ ¡Bienvenido al Mundo de Pixel Wall-E! �[/b][/font_size]
+@"[center][font_size=28][b]🛠️ ¡Bienvenido al Mundo de Pixel Wall-E! 🤖[/b][/font_size]
 
 [img]res://Resources/Images/Designer.png[/img]
 
@@ -38,7 +38,7 @@ Al posicionar el cursor sobre cualquier comando:
 [font_size=28]📝 Sistema de Comentarios[/font_size]
 [left][b]Una línea:[/b]
 [bgcolor=#272822][code][table=1][cell][color=#75715E]// Esto es un comentario[/color][/cell]
-[cell][color=#A6E22E]DrawRectangle[/color][color=#F92672]([/color][color=#AE81FF]0[/color][color=#F92672],[/color][color=#AE81FF]0[/color][color=#F92672])[/color] [color=#75715E]// Posición inicial[/color][/cell][/table][/code][/bgcolor]
+[cell][color=#A6E22E]Spawn[/color][color=#F92672]([/color][color=#AE81FF]0[/color][color=#F92672],[/color][color=#AE81FF]0[/color][color=#F92672])[/color] [color=#75715E]// Posición inicial[/color][/cell][/table][/code][/bgcolor]
 
 [b]Multilínea:[/b]
 [bgcolor=#272822][code][table=1][cell][color=#75715E]/*[/color][/cell]
@@ -50,7 +50,7 @@ Al posicionar el cursor sobre cualquier comando:
 [font_size=28]📥 Tipos de Entrada[/font_size]
 [left]1.[b]Editor Integrado[/b] ✏️ con todas las ayudas
 [bgcolor=#272822][code][table=1][cell][color=#75715E]// Mi primer programa[/color][/cell]
-[cell][color=#A6E22E]DrawRectangle[/color][color=#F92672]([/color][color=#AE81FF]0[/color][color=#F92672],[/color][color=#AE81FF]0[/color][color=#F92672])[/color][/cell]
+[cell][color=#A6E22E]Spawn[/color][color=#F92672]([/color][color=#AE81FF]0[/color][color=#F92672],[/color][color=#AE81FF]0[/color][color=#F92672])[/color][/cell]
 [cell][color=#A6E22E]Color[/color][color=#F92672]([/color][color=#E6DB74]""Blue""[/color][color=#F92672])[/color][/cell][/table][/code][/bgcolor]
 
 2.[b]Archivos .pw[/b] 💾
@@ -162,7 +162,7 @@ Lo único que limita el tamaño del canvas es la memoria de tu dispositivo.
 [cell][color=#A6E22E]Color[/color][color=#F92672]([/color][color=#E6DB74]""Orange""[/color][color=#F92672])[/color][/cell]
 [cell][color=#A6E22E]Fill[/color][color=#F92672]()[/color]   [color=#75715E]// Rellena toda el área blanca conectada[/color][/cell][/table][/code][/bgcolor][/left]
 
-[color=#E74C3C][b]Tip Pro:[/b] Combina estas instrucciones para crear arte complejo![/color]",
+[color=#E74C3C][b]Tip Pro:[/b] ¡Combina estas instrucciones para crear arte complejo![/color]",
             "[center][b]Documentación: [i]Instrucciones[/i][/b][/center]"),
         ["Variables"] = (@"===== 📊 VARIABLES Y ASIGNACIONES =====
 
@@ -185,7 +185,7 @@ Lo único que limita el tamaño del canvas es la memoria de tu dispositivo.
 [left][table=3,baseline,baseline,0]
 [cell][b]Tipo[/b][/cell][cell][b]Ejemplo[/b][/cell][cell][b]Descripción[/b][/cell]
 [cell]Numérico [/cell][cell]x <- 5 [/cell][cell]Enteros (positivos/negativos)[/cell]
-[cell]Booleano [/cell][cell]activo <- 1 [/cell][cell]true o false[/cell]
+[cell]Booleano [/cell][cell]activo <- true [/cell][cell]true o false[/cell]
 [/table][/left]
 
 [font_size=28]💡 Ejemplos Prácticos[/font_size]
@@ -211,7 +211,7 @@ Lo único que limita el tamaño del canvas es la memoria de tu dispositivo.
 Ejemplo:
 [bgcolor=#272822][code][table=1][cell][color=#A6E22E]DrawLine[/color][color=#F92672]([/color][color=#F8F8F2]x[/color][color=#F92672],[/color] [color=#AE81FF]0[/color][color=#F92672],[/color] [color=#AE81FF]10[/color][color=#F92672])[/color]  [color=#75715E]// Funciona[/color]        [/cell][/table][/code][/bgcolor][/left]
 
-[color=#2ECC71][b]Consejo profesional:</b> Usa nombres descriptivos para tus variables![/color]",
+[color=#2ECC71][b]Consejo profesional:[/b] ¡Usa nombres descriptivos para tus variables![/color]",
 "[center][b]Documentación: [i]Variables y Asignaciones[/i][/b][/center]"),
         ["Expr"] = (@"===== 🧮 EXPRESIONES DEL LENGUAJE =====
 
@@ -264,7 +264,7 @@ Ejemplo:
 [color=#3498DB][b]Combinando todo:[/b][/color]
 [bgcolor=#272822][code][table=1][cell][color=#F8F8F2]area_valida[/color] [color=#F92672]<-[/color] [color=#F92672]([/color] [color=#F92672]([/color][color=#F8F8F2]ancho[/color] [color=#F92672]*[/color] [color=#F8F8F2]alto[/color][color=#F92672])[/color] [color=#F92672]>[/color] [color=#AE81FF]100[/color] [color=#F92672]&&[/color] [color=#F92672]([/color][color=#F8F8F2]ancho[/color] [color=#F92672]<[/color] [color=#A6E22E]GetCanvasSize[/color][color=#F92672]()[/color][color=#F92672])[/color] [color=#F92672])[/color] [color=#F92672]||[/color] [color=#F92672]([/color][color=#F8F8F2]es_especial[/color] [color=#F92672]==[/color] [color=#AE81FF]1[/color][color=#F92672])[/color]        [/cell][/table][/code][/bgcolor][/left]
 
-[color=#2ECC71][b]Tip de depuración:[/b] Usa paréntesis para hacer claras las precedencias en expresiones complejas![/color]",
+[color=#2ECC71][b]Tip de depuración:[/b] ¡Usa paréntesis para hacer claras las precedencias en expresiones complejas![/color]",
  "[center][b]Documentación: [i]Expresiones[/i][/b][/center]"),
         ["Func"] = (
     @"===== 🛠 FUNCIONES DEL LENGUAJE =====
@@ -304,7 +304,7 @@ Ejemplo:
 [cell][color=#F92672]}[/color][/cell]
 [cell][color=#F8F8F2]D[/color] [color=#F92672]<-[/color] [color=#A6E22E]distancia[/color][color=#F92672]([/color][color=#AE81FF]0[/color][color=#F92672],[/color] [color=#AE81FF]0[/color][color=#F92672],[/color] [color=#A6E22E]GetActualX[/color][color=#F92672]()[/color][color=#F92672],[/color] [color=#A6E22E]GetActualY[/color][color=#F92672]()[/color][color=#F92672])[/color][/cell][/table][/code][/bgcolor][/left]
 
-[color=#2ECC71][b]Consejo avanzado:[/b] Agrupa funciones relacionadas en tu código para mejor organización![/color]"
+[color=#2ECC71][b]Consejo avanzado:[/b] ¡Agrupa funciones relacionadas en tu código para mejor organización![/color]"
     , "[center][b]Documentación: [i]Funciones[/i][/b][/center]"),
     ["GoTo"] =(@"===== 🔀 SALTOS CONDICIONALES =====
 
@@ -342,14 +342,14 @@ Ejemplo:
 [cell][color=#F8F8F2]Bucle[/color][/cell]
 [cell][color=#A6E22E]DrawLine[/color]([color=#AE81FF]1[/color], [color=#AE81FF]0[/color], [color=#AE81FF]1[/color])[/cell]
 [cell][color=#F8F8F2]contador[/color] [color=#F92672]<-[/color] [color=#F8F8F2]contador[/color] [color=#F92672]+[/color] [color=#AE81FF]1[/color][/cell]
-[cell][color=#F92672]GoTo [[/color][color=#F8F8F2]bucle[/color][color=#F92672]] ([/color][color=#F8F8F2]contador[/color] [color=#F92672]<[/color] [color=#AE81FF]10[/color][color=#F92672])[/color][/cell][/table][/code][/bgcolor][/left]
+[cell][color=#F92672]GoTo [[/color][color=#F8F8F2]Bucle[/color][color=#F92672]] ([/color][color=#F8F8F2]contador[/color] [color=#F92672]<[/color] [color=#AE81FF]10[/color][color=#F92672])[/color][/cell][/table][/code][/bgcolor][/left]
 
 [color=#E74C3C][b]Importante:[/b] La etiqueta debe existir en el código[/color]
 
 [font_size=28]🔄 Patrones Comunes[/font_size]
 [left][color=#3498DB][b]1. Bucles:[/b][/color]
 [bgcolor=#272822][code][table=1][cell][color=#F8F8F2]i[/color] [color=#F92672]<-[/color] [color=#AE81FF]0[/color][/cell]
-[cell][color=#F8F8F2]Inicio_bucle[/color][/cell]
+[cell][color=#F8F8F2]inicio_bucle[/color][/cell]
 [cell][color=#75715E]// Código a repetir[/color][/cell]
 [cell][color=#F8F8F2]i[/color] [color=#F92672]<-[/color] [color=#F8F8F2]i[/color] [color=#F92672]+[/color] [color=#AE81FF]1[/color][/cell]
 [cell][color=#F92672]GoTo [[/color][color=#F8F8F2]inicio_bucle[/color][color=#F92672]] ([/color][color=#F8F8F2]i[/color] [color=#F92672]<[/color] [color=#AE81FF]5[/color][color=#F92672])[/color][/cell][/table][/code][/bgcolor]
@@ -391,7 +391,7 @@ Ejemplo:
 • Comenta los saltos complejos
 • Evita saltos excesivos (puede hacer código difícil de leer)[/left]
 
-[color=#2ECC71][b]Tip avanzado:[/b] Combina con funciones para estructurar mejor tu código![/color]",
+[color=#2ECC71][b]Tip avanzado:[/b] ¡Combina con funciones para estructurar mejor tu código![/color]",
 "[center][b]Documentación:[i]Saltos Condicionales[/i][/b][/center]"),
 ["Additionals"]=(@"===== 🏗 ESTRUCTURAS DE CONTROL =====
 
@@ -444,7 +444,7 @@ Ejemplo:
 [cell][color=#F92672]while[/color] [color=#F92672]([/color][color=#F8F8F2]contador[/color] [color=#F92672]<[/color] [color=#AE81FF]5[/color][color=#F92672])[/color][/cell]
 [cell][color=#F92672]{[/color][/cell]
 [cell]    [color=#A6E22E]DrawLine[/color][color=#F92672]([/color][color=#AE81FF]1[/color][color=#F92672],[/color] [color=#AE81FF]0[/color][color=#F92672],[/color] [color=#AE81FF]10[/color][color=#F92672])[/color][/cell]
-[cell]    [color=#F8F8F2]Contador[/color] [color=#F92672]<-[/color] [color=#F8F8F2]contador[/color] [color=#F92672]+[/color] [color=#AE81FF]1[/color]    [/cell]
+[cell]    [color=#F8F8F2]contador[/color] [color=#F92672]<-[/color] [color=#F8F8F2]contador[/color] [color=#F92672]+[/color] [color=#AE81FF]1[/color]    [/cell]
 [cell][color=#F92672]}[/color][/cell][/table][/code][/bgcolor][/left]
 
 [color=#E74C3C][b]Precaución:[/b] Asegurar que la condición pueda volverse falsa[/color]
@@ -522,7 +522,7 @@ Ejemplo:
 [cell]    [color=#F92672]}[/color][/cell]
 [cell][color=#F92672]}[/color][/cell][/table][/code][/bgcolor][/left]
 
-[color=#2ECC71][b]Consejo Pro:[/b] Usa estas estructuras para crear patrones complejos y algoritmos de dibujo avanzados![/color]",
+[color=#2ECC71][b]Consejo Pro:[/b] ¡Usa estas estructuras para crear patrones complejos y algoritmos de dibujo avanzados![/color]",
 "[center][b]Documentación:[i]Estructuras de Control[/i][/b][/center]")
     };
     RichTextLabel Title;

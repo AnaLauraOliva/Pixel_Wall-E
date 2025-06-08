@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using Godot;
 
 public static class Canvas
 {
@@ -36,21 +35,21 @@ public static class Canvas
     }
     #region Wall-E functions
     public static int GetCanvasSize() => pixels.GetLength(0);
-    public static int GetActualX()=>robot.X;
-    public static int GetActualY()=>robot.Y;
+    public static int GetActualX() => robot.X;
+    public static int GetActualY() => robot.Y;
     public static int GetColorCount(string color, int x1, int y1, int x2, int y2)
     {
-        if(x1<0||x2<0||y1<0||y2<0||x1>=GetCanvasSize()||y1>=GetCanvasSize()||x2>=GetCanvasSize()||y2>=GetCanvasSize()) return 0;
-        int minX = Math.Min(x1,x2);
-        int maxX = Math.Max(x1,x2);
-        int minY = Math.Min(y1,y2);
-        int maxY = Math.Max(y1,y2);
+        if (x1 < 0 || x2 < 0 || y1 < 0 || y2 < 0 || x1 >= GetCanvasSize() || y1 >= GetCanvasSize() || x2 >= GetCanvasSize() || y2 >= GetCanvasSize()) return 0;
+        int minX = Math.Min(x1, x2);
+        int maxX = Math.Max(x1, x2);
+        int minY = Math.Min(y1, y2);
+        int maxY = Math.Max(y1, y2);
         int counter = 0;
         for (int y = minY; y <= maxY; y++)
         {
             for (int x = minX; x <= maxX; x++)
             {
-                if (pixels[y,x].Color==color)
+                if (pixels[y, x].Color == color)
                 {
                     counter++;
                 }
@@ -58,12 +57,12 @@ public static class Canvas
         }
         return counter;
     }
-    public static int IsBrushColor(string color)=>color==brushColor?1:0;
-    public static int IsBrushSize(int size)=>size == brushSize?1:0;
+    public static int IsBrushColor(string color) => color == brushColor ? 1 : 0;
+    public static int IsBrushSize(int size) => size == brushSize ? 1 : 0;
     public static int IsCanvasColor(string color, int vertical, int horizontal)
     {
-        if(robot.X+horizontal<0||robot.X+horizontal>=GetCanvasSize()||robot.Y+vertical<0||robot.Y+vertical>=GetCanvasSize()) return 0;
-        return pixels[robot.Y+vertical, robot.X+horizontal].Color==color?1:0;
+        if (robot.X + horizontal < 0 || robot.X + horizontal >= GetCanvasSize() || robot.Y + vertical < 0 || robot.Y + vertical >= GetCanvasSize()) return 0;
+        return pixels[robot.Y + vertical, robot.X + horizontal].Color == color ? 1 : 0;
     }
     #endregion
     #region Wall-E intructions
@@ -81,13 +80,13 @@ public static class Canvas
                 Command = "Spawn",
                 X = x,
                 Y = y,
-                Color = "Transparent"
+                Color = "#FF8C00"
             }
         );
-        if(robot.X!=-1&&robot.Y!=-1)
-        robot.MoveWallE(x,y,pixels);
+        if (robot.X != -1 && robot.Y != -1)
+            robot.MoveWallE(x, y, pixels);
         else
-        robot.Spawn(x, y, pixels);
+            robot.Spawn(x, y, pixels);
     }
     public static void DrawLine(int dirX, int dirY, int distance)
     {
@@ -125,35 +124,25 @@ public static class Canvas
                 dirX = dirX,
                 dirY = dirY,
                 distance = distance,
-                Color = brushColor,
+                Color = "#FF8C00",
                 brushSize = brushSize,
             }
         );
         robot.MoveWallE(x1, y1, pixels);
     }
-
     public static void DrawCircle(int dirX, int dirY, int radius)
     {
+        PutInstructionInTheQueue(
+            new DrawCommand
+            {
+                Command = "QuitWallE",
+                X = robot.X,
+                Y = robot.Y,
+                Color = pixels[robot.X, robot.Y].Color,
+            }
+        );
         int CenterX = robot.X + dirX * radius;
         int CenterY = robot.Y + dirY * radius;
-        int x = 0;
-        int y = radius;
-        int d = 3 - 2 * radius;
-        DrawCirclePoints(CenterX, CenterY, x, y);
-        while (y >= x)
-        {
-            x++;
-            if (d > 0)
-            {
-                y--;
-                d = d + 4 * (x - y) + 10;
-            }
-            else
-            {
-                d = d + 4 * x + 6;
-            }
-            DrawCirclePoints(CenterX, CenterY, x, y);
-        }
         PutInstructionInTheQueue(
             new DrawCommand
             {
@@ -163,17 +152,63 @@ public static class Canvas
                 dirX = dirX,
                 dirY = dirY,
                 radius = radius,
-                Color = brushColor,
+                Color = "#FF8C00",
                 brushSize = brushSize,
             }
         );
+        int x = 0;
+        int y = radius;
+        //int p = 3-(2*radius);
+        //int p = 5 / 4 - radius;
+        DrawCirclePoints(CenterX, CenterY, x, y);
+        while (x <= y)
+        {
+            x++;
+            /*if (p <= 0)
+            {
+                p = p + 2 * x + 1;
+            }
+            else
+            {
+                y--;
+                p = p + 2 * x + 1 - 2 * y;
+            }
+            //PaintPixel(CenterX+x,CenterY+y);*/
+            y=(int)Math.Round(Math.Sqrt(Math.Pow(radius,2)-Math.Pow(x,2)),0);
+            DrawCirclePoints(CenterX, CenterY, x, y);
+        }
         robot.MoveWallE(CenterX, CenterY, pixels);
     }
 
     public static void DrawRectangle(int dirX, int dirY, int distance, int width, int height)
     {
+        PutInstructionInTheQueue(
+            new DrawCommand
+            {
+                Command = "QuitWallE",
+                X = robot.X,
+                Y = robot.Y,
+                Color = pixels[robot.X, robot.Y].Color,
+            }
+        );
         int CenterX = robot.X + dirX * distance;
         int CenterY = robot.Y + dirY * distance;
+
+        PutInstructionInTheQueue(
+            new DrawCommand
+            {
+                Command = "DrawRectangle",
+                X = CenterX,
+                Y = CenterY,
+                dirX = dirX,
+                dirY = dirY,
+                distance = distance,
+                width = width,
+                height = height,
+                Color = "#FF8C00",
+                brushSize = brushSize,
+            }
+        );
         int halfWidth = width / 2;
         int halfHeight = height / 2;
         int left = CenterX - 1 - halfWidth;
@@ -191,21 +226,6 @@ public static class Canvas
             PaintPixel(x, button);
             PaintPixel(x, top);
         }
-        PutInstructionInTheQueue(
-            new DrawCommand
-            {
-                Command = "DrawRectangle",
-                X = CenterX,
-                Y = CenterY,
-                dirX = dirX,
-                dirY = dirY,
-                distance = distance,
-                width = width,
-                height = height,
-                Color = brushColor,
-                brushSize = brushSize,
-            }
-        );
         robot.MoveWallE(CenterX, CenterY, pixels);
     }
     public static void Fill()
@@ -232,7 +252,7 @@ public static class Canvas
                    Command = "PaintPixel",
                    X = robot.X,
                    Y = robot.Y,
-                   Color = brushColor
+                   Color = "#FF8C00"
                }
            );
     }
@@ -242,6 +262,7 @@ public static class Canvas
     {
 
         if (brushColor == "Transparent") return;
+        if(x >= 0 && x < GetCanvasSize() && y >= 0 && y < GetCanvasSize() && pixels[y, x].Color != brushColor)
         PutInstructionInTheQueue(
             new DrawCommand
             {
@@ -254,7 +275,12 @@ public static class Canvas
         );
         if (brushSize == 1)
         {
-            pixels[y, x].Color = brushColor;
+            //if(!(pixels[x,y].Color==brushColor))
+            if (x >= 0 && x < GetCanvasSize() && y >= 0 && y < GetCanvasSize() && pixels[y, x].Color != brushColor)
+            {
+                //Is y,x because on arrays is row, column
+                pixels[y, x].Color = brushColor;
+            }
             return;
         }
         int halfSize = brushSize / 2;
@@ -264,21 +290,21 @@ public static class Canvas
             {
                 int nx = x + dx;
                 int ny = y + dy;
-                if (nx >= 0 && nx < GetCanvasSize() && ny >= 0 && ny < GetCanvasSize())
+                if (nx >= 0 && nx < GetCanvasSize() && ny >= 0 && ny < GetCanvasSize() && pixels[ny, nx].Color != brushColor)
                     pixels[ny, nx].Color = brushColor;
             }
         }
     }
-    private static void DrawCirclePoints(int CenterX, int CenterY, int x, int y)
+    private static void DrawCirclePoints(int xc, int yc, int x, int y)
     {
-        PaintPixel(CenterX + x, CenterY + y);
-        PaintPixel(CenterX + y, CenterY + x);
-        PaintPixel(CenterX - y, CenterY + x);
-        PaintPixel(CenterX - x, CenterY + y);
-        PaintPixel(CenterX - x, CenterY - y);
-        PaintPixel(CenterX - y, CenterY - x);
-        PaintPixel(CenterX + y, CenterY - x);
-        PaintPixel(CenterX + x, CenterY - y);
+        PaintPixel(xc + x, yc + y);
+        PaintPixel(xc + x, yc - y);
+        PaintPixel(xc - x, yc + y);
+        PaintPixel(xc - x, yc - y);
+        PaintPixel(xc + y, yc + x);
+        PaintPixel(xc + y, yc - x);
+        PaintPixel(xc - y, yc + x);
+        PaintPixel(xc - y, yc - x);
     }
     #endregion
     private static void PutInstructionInTheQueue(DrawCommand command)
@@ -290,16 +316,16 @@ public static class Canvas
     public static void MakePrevious()
     {
         //If you do previous = pixels this error correction will not work because if you update pixels, privious will be updated too
-        previous = new Pixel[GetCanvasSize(),GetCanvasSize()];
+        previous = new Pixel[GetCanvasSize(), GetCanvasSize()];
         for (int i = 0; i < previous.GetLength(0); i++)
         {
             for (int j = 0; j < previous.GetLength(1); j++)
             {
-                previous[i,j] = new Pixel(pixels[i,j].X0, pixels[i,j].Y0, pixels[i,j].X1, pixels[i,j].Y1, pixels[i,j].Color);
+                previous[i, j] = new Pixel(pixels[i, j].X0, pixels[i, j].Y0, pixels[i, j].X1, pixels[i, j].Y1, pixels[i, j].Color);
             }
         }
     }
-    public static void BackToPrevious()=>pixels = previous;
+    public static void BackToPrevious() => pixels = previous;
 
 }
 public struct DrawCommand
