@@ -246,15 +246,6 @@ public static class Canvas
             queue.Enqueue((p.Item1, p.Item2 + 1));
             queue.Enqueue((p.Item1, p.Item2 - 1));
         }
-        PutInstructionInTheQueue(
-               new DrawCommand
-               {
-                   Command = "PaintPixel",
-                   X = robot.X,
-                   Y = robot.Y,
-                   Color = "#FF8C00"
-               }
-           );
     }
     #endregion
     #region Auxiliar methods
