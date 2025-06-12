@@ -308,7 +308,7 @@ public partial class CodeEditVisual : CodeEdit
         if (_completionData is null) return complete;
         return _completionData.TryGetValue(key, out (Color color, string tooltip, string autocomplete, CodeCompletionKind kind) value) ? complete += value.tooltip : _colorsData.TryGetValue(key, out value) ? complete + value.tooltip : $"[i] No hay información para '{key}'[/i]";
     }
-    private void Compile()
+    public void Compile()
     {
         Handler handler = new Handler(this.Text);
         handler.Handle();

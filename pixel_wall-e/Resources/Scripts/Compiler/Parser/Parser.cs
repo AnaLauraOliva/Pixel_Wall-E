@@ -6,12 +6,12 @@ public class Parser
 {
     private readonly List<Token> _tokens;
     private List<CompilerException> exceptions;
-    public Dictionary<string, ExpressionType> vars;
+    public List<string> vars;
     private int _current = 0;
     private int spawnCount = 0;
     public Parser(List<Token> tokens)
     {
-        vars = new Dictionary<string, ExpressionType>();
+        vars = new List<string>();
         _tokens = tokens;
         exceptions = new List<CompilerException>();
     }
@@ -94,7 +94,7 @@ public class Parser
             if (match(TokenType.FUNCTION)) return function("function");
             if (match(TokenType.IDENTIFIER))
             {
-                if ((check(TokenType.EOL) || check(TokenType.EOF) || !vars.ContainsKey(previous().Lexeme)) && !check(TokenType.LEFT_PAREN))
+                if ((check(TokenType.EOL) || check(TokenType.EOF) || !vars.Contains(previous().Lexeme)) && !check(TokenType.LEFT_PAREN))
                     return VarDeclaration();
                 else GoPrevious();
             }
@@ -174,7 +174,8 @@ public class Parser
         }
         if (peek().Type != TokenType.EOF && !isFor)
             consume(TokenType.EOL, @"Expected line break ('\n') at end of variable declaration");
-        vars.Add(name.Lexeme, initializer.type);
+        if(!isFor)
+        vars.Add(name.Lexeme);
         return new VariableStmt(name, initializer);
     }
     private Stmt Statement()
@@ -538,8 +539,7 @@ public class Parser
         if (match(TokenType.IDENTIFIER))
         {
             Token name = previous();
-            ExpressionType type = vars.ContainsKey(name.Lexeme) ? vars[name.Lexeme] : ExpressionType.VOID;
-            return new Variable(name, type);
+            return new Variable(name);
         }
         if (match(TokenType.LEFT_PAREN))
         {

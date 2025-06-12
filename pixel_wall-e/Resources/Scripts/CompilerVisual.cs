@@ -113,6 +113,9 @@ public partial class CompilerVisual : Node
             string codeContent = File.ReadAllText(filePath);
             popup.GetNode<Label>("Text").Text = "Archivo importado correctamente desde " + filePath;
             _codeEdit.Text = codeContent;
+            CodeEditVisual ce = GetNode<HBoxContainer>("TextContainer").GetNode<CodeEditVisual>("CodeEdit");
+            
+            ce.Compile();
             //Compile();
         }
         catch (System.Exception e)

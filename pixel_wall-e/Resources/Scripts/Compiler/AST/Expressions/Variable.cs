@@ -1,9 +1,8 @@
 public class Variable : Expression
 {
-    public Variable(Token name, ExpressionType type)
+    public Variable(Token name)
     {
         Name = name;
-        this.type = type;
     }
     public void defineType(ExpressionType type)=>this.type = type;
     public Token Name { get; }
