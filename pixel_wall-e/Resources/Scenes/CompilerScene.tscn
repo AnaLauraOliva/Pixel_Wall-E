@@ -134,6 +134,25 @@ vertical_scroll_mode = 3
 [node name="yAxisContainer" type="Control" parent="CanvasPanel/yAxisScroll"]
 layout_mode = 2
 
+[node name="SaveCanvas" type="Button" parent="CanvasPanel"]
+offset_left = 345.0
+offset_top = 14.0
+offset_right = 517.0
+offset_bottom = 52.0
+theme_override_colors/font_disabled_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.669315, 0.669315, 0.669315, 1)
+theme_override_colors/font_hover_color = Color(0.797659, 0.797658, 0.797659, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.670588, 0.670588, 0.670588, 1)
+theme_override_constants/outline_size = 9
+theme_override_fonts/font = ExtResource("2_nveu8")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("StyleBoxTexture_unv02")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_c4ljo")
+theme_override_styles/normal = SubResource("StyleBoxTexture_k25d3")
+text = "Guardar foto"
+
 [node name="TextContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
@@ -349,6 +368,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[connection signal="pressed" from="CanvasPanel/SaveCanvas" to="." method="_on_save_canvas_pressed"]
 [connection signal="button_down" from="ButtonsContainer/Execute" to="." method="_on_execute_button_down"]
 [connection signal="button_down" from="ButtonsContainer/Back" to="." method="_on_back_button_down"]
 [connection signal="button_down" from="ButtonsContainer/Exit" to="." method="_on_exit_button_down"]

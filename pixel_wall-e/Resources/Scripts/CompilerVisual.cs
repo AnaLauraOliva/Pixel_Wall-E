@@ -60,10 +60,35 @@ public partial class CompilerVisual : Node
         {
             Import(path);
         }
-        else if (dialog.FileMode == FileDialog.FileModeEnum.SaveFile)
+        else if (dialog.FileMode == FileDialog.FileModeEnum.SaveFile&&dialog.Title=="Guardar archivo")
         {
             Export(path);
         }
+        else if(dialog.FileMode == FileDialog.FileModeEnum.SaveFile&&dialog.Title=="Guardar foto")
+        {
+            SavePhoto(path);
+        }
+    }
+    private void SavePhoto(string filePath)
+    {
+        if(!filePath.EndsWith(".jpg")&&!filePath.EndsWith(".jpeg")&&!filePath.EndsWith(".png"))filePath+=".png";
+        try
+        {
+            TextureRect textureRect = GetNode<TextureRect>("BigCanvas");
+            ImageTexture imageTexture = (ImageTexture)textureRect.Texture;
+            Image image = imageTexture.GetImage();
+            if(filePath.EndsWith(".jpg")||!filePath.EndsWith(".jpeg")) image.SaveJpg(filePath);
+            else image.SavePng(filePath);
+            popup.GetNode<Label>("Text").Text = "Imagen exportada correctamente a " + filePath;
+            popup.Visible = true;
+        }
+        catch (Exception e)
+        {
+            popup.GetNode<Label>("Text").Text = "Error al exportar la imagen: " + e.Message;
+            popup.Visible = true;
+        }
+        dialog.ClearFilters();
+        dialog.AddFilter("*.pw", "Pixel Wall-E File");
     }
     private void _on_execute_button_down()
     {
@@ -134,6 +159,15 @@ public partial class CompilerVisual : Node
     {
         dialog.FileMode = FileDialog.FileModeEnum.OpenFile;
         dialog.Title = "Importar archivo";
+        dialog.Show();
+    }
+    private void _on_save_canvas_pressed()
+    {
+        dialog.FileMode = FileDialog.FileModeEnum.SaveFile;
+        dialog.ClearFilters();
+        dialog.AddFilter("*.png");
+        dialog.AddFilter("*.jpg");
+        dialog.Title = "Guardar foto";
         dialog.Show();
     }
     private void OkPressed() => popup.Visible = false;
