@@ -73,7 +73,6 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
     }
     public void Interpret(List<Stmt> Statements)
     {
-        Canvas.MakePrevious();
         try
         {
             for (int i = 0; i < Statements.Count; i++)
@@ -96,7 +95,6 @@ public class Interpreter : IExpressionVisitor<object>, IStatementVisitor<object>
         }
         catch (RunTimeError error)
         {
-            Canvas.BackToPrevious();
             exceptions.Add(error);
         }
         catch (Return)

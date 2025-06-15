@@ -79,8 +79,8 @@ public partial class CompilerVisual : Node
             else
             {
                 _problems.Text = "Compilado correctamente";
-                script.ExecuteCommandQueue(Canvas.getQueue());
             }
+            script.ExecuteCommandQueue(Canvas.getQueue());
         }
         Canvas.QuitInstructionsInTheQueue();
     }
